@@ -17,7 +17,7 @@ Runtime, assets, documentation, tests and tools are preserved. Git history and
 the upstream GitHub workflow are not embedded. The only runtime integration
 change: `src/app.js` registers its worker only in a top-level document. The root
 worker caches its entire runtime for embedded offline use. It retains its own
-settings and version. The collection's pixel font is adapted from Flappy.
+settings and version.
 The imported version-hook test additionally sets its temporary hook executable
 on POSIX; staging Git's executable bit alone does not change filesystem mode.
 
@@ -55,37 +55,94 @@ up `0x0D10`; down `0x0D28`; closed phases `0x0D40`–`0x0D88`; wall `0x0FFD`;
 ring `0x1015`. Upper attribute bits are excluded from visible pixels. Canvas
 shows the 288 × 256 game area without smoothing.
 
-Rules reconstruct half-cell motion, continuing direction, five lives, four
-invulnerable ghosts, persistent tombstones, native completion targets, ring
-rewards, eleven-map cycles and bonus lives. The starting ring under the player
-is removed without scoring. Native routines consulted: map `0x044E`, ghost
-decisions `0x04E4`–`0x0664`, controls `0x0691`, ring reward `0x0725`, completion
-`0x0788` and death/reset `0x0805`.
+### Original logic, speed and sound
 
-### Explicit fidelity limits
+The previous approximate rules have been removed. `assets/pampuch-native.js`
+contains the actual 3,984-byte game program (the tape checksum is excluded) and
+the unmodified 4 KiB **PMD 85-1 monitor**. The custom JavaScript core executes
+the game instructions and monitor routines directly. Ghost order/decisions,
+byte-level framebuffer probes, XOR sprites, partial-ring clearing, input polling,
+death delays, tombs, bonus lives and automatic level transitions are native code.
+There is no second set of JavaScript game rules or geometric collision model.
 
-This is a JavaScript reimplementation, not an 8080/PMD emulator. Imported map
-bytes and visible sprite pixels are exact. Other behavior remains a
-reconstruction and must not be described as verified cycle-exact behavior:
+Monitor ROM SHA-256:
+`1fed5851c353d24f99eae88bfdb858ca0e01c9d737be94eb7e761efeeb84a849`.
 
-- Simulation starts at a 120 ms half-step and speeds up after maps four/eight.
-  Browser timing and the minimum interval differ from native processor delays.
-- Ghosts continue until blocked, then choose a chase axis toward the player,
-  using a shared five-block counter. This high-level translation is not
-  differentially verified against all native decision branches or framebuffer
-  byte probes.
-- Walls, tombs and actors use rectangles on the half-cell grid. Native byte
-  collisions, corner cases, sprite overlaps and half-collected ring graphics
-  can differ.
-- `js/audio.js` synthesizes new short square-wave effects for steps, rings,
-  starting, death and completion. They are approximations, not original
-  recordings or exact transcriptions of PMD monitor sound routines. The music
-  variant's continuous melody is not included.
-- Browser overlays replace the title, high-score name entry/table and some
-  transition delays. The best score stays local. A tomb can still make a maze
-  impossible, as in the original; new-game confirmation provides recovery.
+ROM source: [GPMD85Emulator's monit1.rom](https://github.com/mborik/GPMD85Emulator/blob/main/rom/monit1.rom),
+snapshot `10c6ad7f62a20efee1228bb1cf2abcb702c6bfde`. The README in that archive
+identifies this as the original PMD 85-1 monitor, rather than the modified 1u,
+1cs or newer PMD model variants. Reproduce/check both runtime data files with:
+
+```sh
+node tools/import-pampuch.mjs path/to/games-2.ptp path/to/monit1.rom --check
+```
+
+`js/i8080.js` implements 8080 instructions and flags. `js/pmd85.js` implements
+the memory map, keyboard matrix, PIO aliases/bit-set-reset and 2,048,000 Hz clock.
+PMD video arbitration follows the instruction durations and clock parity in
+GPMD85Emulator's `ChipCpu8080P.{cpp,h}`. The adapted timing table's MIT notice is
+retained in `vendor/LICENSE.pmd-timing`. Frame rate controls presentation only;
+an accumulated cycle budget prevents rounding drift between animation frames.
+
+`js/audio.js` renders PCM from the original OUT operations at their recorded
+CPU cycles. Port C bit 2 directly drives the speaker; bits 1/0 gate the PMD's
+4 kHz/1 kHz dividers (256/1,024 CPU cycles per half period). Absolute cycle phase
+is preserved across frames and saves. No additional start/death/step note effect
+is invented. Waveforms are resampled to the browser's audio rate. In particular,
+the native ring pulse is not the old invented two-note sound.
+
+### Independent verification
+
+The processor passes the public historical diagnostics mirrored by
+[superzazu/8080](https://github.com/superzazu/8080), snapshot
+`274ffd700b81baabea99b0963bc1260b67132185`, with their independently published
+cycle totals: 8080PRE **7,817**, TST8080 **4,924**, CPUTEST **255,653,383**.
+The complete 8080EXM exerciser also passed all checksums, **2,919,050,698**
+instructions and **23,803,381,171** cycles. Set `PMD_EXTENDED_CPU_TEST=1` to repeat
+that longer check. Fixture origins/hashes are in `tests/fixtures/i8080/README.md`.
+
+`tests/fixtures/pampuch-native-trace.json` was generated with the independent
+superzazu **C core**, executing the same original game and ROM with GPMD's wait
+states. The test compares 2,400 100-ms checkpoints across four scenarios: 180
+seconds of pursuit/movement/deaths/tombs; completion of map four; completion of
+map eight; timer expiration. Completion fixtures set the native remaining-ring
+counter to one to exercise the original transition/bonus-life branches.
+Every checkpoint compares all RAM/ROM bytes via a 32-bit hash, CPU registers,
+program counter/stack/flags, cycle total and a hash/count of every timestamped
+sound-port transition. These expectations come from C, not the JS engine.
+
+To regenerate/check with separate source checkouts and a C compiler:
+
+```sh
+node tools/check-original-pampuch.mjs path/to/8080 path/to/GPMD85Emulator path/to/games-2.ptp path/to/cc --write-fixture
+```
+
+The C reference sources/compiler are development inputs, not runtime libraries
+or bundled application dependencies. Normal CI uses the committed reference
+fixtures and needs only Node. PCM tests additionally verify the 1/4 kHz gates,
+OUT timing and invariance under different frame partitions.
+
+### Browser boundary and limits
+
+- The cassette loader/title/map selector is bypassed after monitor startup;
+  the game starts at `0103h`, selecting map 1 through the same operands written
+  by the original menu at `1088h`. Gameplay/monitor instructions are unmodified.
+- The browser adds pause, restart confirmation, expanded view, touch keys and
+  saved CPU/RAM state. Death and map transitions execute automatically with
+  their original delays. Execution stops at `08BDh` after the final native death
+  sound, before native name entry; the browser displays its game-over overlay.
+- This runtime implements the hardware used by this game, not a general-purpose
+  PMD emulator with cassette, peripherals or interrupt-driven applications.
+  Verification is against independent execution plus documented PMD timing,
+  not a physical-machine audio recording. Speaker response, output volume and
+  browser audio latency naturally depend on the playback device. Presentation
+  is capped at the browser frame rate; background tabs pause explicitly.
+- This is PAMPUCH, not the ON&DUCH4 music variant; no continuous melody is added.
+  Best scores remain local. Incompatible approximate v1 saves are not converted;
+  the v2 format preserves RAM, CPU registers, cycle position and divider phase.
 
 Public archival availability does not establish a new license for original
 games or artwork. Authorship and upstream notices remain with their material;
-this repository grants no additional rights to it. Downloaded tape archives
-and reference screenshots are development inputs, excluded from publication.
+this repository grants no additional rights to it. The runtime now includes
+the original game/monitor program data as identified above. Whole downloaded
+tape archives and reference screenshots remain excluded from publication.

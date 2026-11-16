@@ -37,11 +37,15 @@ Enter pokračuje, N vyvolá novou hru, H přepíná nápovědu, F zvětšení a 
 Nová hra vyžaduje potvrzení; Escape ho zruší. Odchod ze hry, ztráta zaměření
 nebo skrytí stránky hru pozastaví. Obnovení stránky načte pozastavenou hru.
 
-Mapy a pixely spritů jsou přesně importované. **Nejde o emulátor PMD s přesným
-časováním procesoru.** Časování prohlížeče, obdélníkové kolize, překlad
-pronásledování duchů a syntetizované zvuky jsou rekonstrukcí. Původní úvod,
-zadávání jmen rekordmanů a souvislá melodie nejsou reprodukované. Původ podkladů
-a konkrétní omezení věrnosti uvádí [SOURCES.md](SOURCES.md).
+Pampuch nyní provádí původní hru i monitor PMD 85-1 na malém vlastním jádře 8080
+v JavaScriptu. Rozhodování duchů, kolize podle bajtů obrazové paměti, čtení kláves,
+prodlevy po smrti i přechody map řídí původní instrukce. Časování používá takt
+2,048 MHz včetně čekání na videoprocesor; pohyb nemá pevný prohlížečový interval.
+Zvuk vzniká z původních zápisů na PIO a hardwarových děličů 1/4 kHz, ne z nově
+vymyšlených tónů. Smrti a přechody map probíhají automaticky.
+Prohlížeč nahrazuje úvod/výběr mapy a zadávání jmen rekordmanů vlastními prvky.
+Jde o původní variantu PAMPUCH, nikoli ON&DUCH4 s hudbou. Přesný rozsah ověření
+a omezení hardwarového jádra uvádí [SOURCES.md](SOURCES.md).
 
 ## Rozhraní, ukládání a offline
 
@@ -50,7 +54,9 @@ Texty jsou v `js/translations.js`. Společná nastavení a Pampuch používají
 klíče `pmd85games.*` v localStorage. Flappy zachovává původní `flappy.*` a
 `flappy-pmd85-progress-v1`, včetně starších uložení na stejném původu.
 Nedostupné úložiště nebrání hraní. Uložení zůstává v tomto prohlížeči,
-bez synchronizace mezi zařízeními.
+bez synchronizace mezi zařízeními. Nativní Pampuch používá `pmd85games.pampuch.v2`
+a ukládá RAM, procesor i fázi zvukových děličů. Nekompatibilní přibližná hra v1
+začne znovu; staré uložení se nemaže. Rekord a nastavení zůstávají zachované.
 
 Volitelná PWA po prvním úplném online načtení uloží obě hry a všechny běhové
 soubory. Instalace vyžaduje HTTPS nebo localhost. Aktualizace čekají na zavření
@@ -79,6 +85,13 @@ lze zopakovat příkazem:
 ```sh
 node tools/import-pampuch.mjs cesta/games-2.ptp --check
 ```
+
+Pro obnovení nativního programu/monitoru připojte cestu k `monit1.rom`.
+Běžné testy spouštějí tři nezávislé diagnostiky 8080 a porovnávají 2 400 nativních
+kontrolních bodů vytvořených nezávislou implementací v C. Úplný exerciser CPU je
+volitelný: nastavte `PMD_EXTENDED_CPU_TEST=1` a spusťte
+`node --test tests/i8080.test.mjs` (přibližně minuta). Generování referenčních dat
+vyžaduje C kompilátor a samostatné zdrojové repozitáře; viz `SOURCES.md`.
 
 Volitelné prohlížečové kontroly vyžadují vývojový server a bezhlavý Chrome
 s odděleným profilem a `--remote-debugging-port=9333`. Spusťte

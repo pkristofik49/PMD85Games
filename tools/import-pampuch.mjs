@@ -13,4 +13,12 @@ const bitmap=p=>Array.from({length:12},(_,y)=>Array.from({length:12},(_,x)=>m[p+
 const sprites={};for(const [name,p]of Object.entries({blank:0xc80,playerLeft:0xce0,tomb:0xc98,ghost:0xcc8,playerRight:0xcf8,playerUp:0xd10,playerDown:0xd28,playerLeftClosed:0xd40,playerRightClosed:0xd58,playerUpClosed:0xd70,playerDownClosed:0xd88,wall:0xffd,ring:0x1015}))sprites[name]=bitmap(p);
 const output='// Extracted from the original PAMPUCH tape. See SOURCES.md.\nglobalThis.PampuchData = '+JSON.stringify({levels,sprites})+';\n';
 if(process.argv.includes('--check'))assert.equal(fs.readFileSync('assets/pampuch-data.js','utf8'),output);else fs.writeFileSync('assets/pampuch-data.js',output);
+const monitorPath=process.argv.slice(3).find(arg=>!arg.startsWith('--'));
+if(monitorPath){
+ const monitor=fs.readFileSync(monitorPath);
+ assert.equal(createHash('sha256').update(monitor).digest('hex'),'1fed5851c353d24f99eae88bfdb858ca0e01c9d737be94eb7e761efeeb84a849','Unexpected PMD 85-1 monitor');
+ const native='// Original PAMPUCH and PMD 85-1 monitor. Provenance and hashes: SOURCES.md.\nglobalThis.PampuchNativeData = '+JSON.stringify({program:[...program.subarray(0,-1)],monitor:[...monitor]})+';\n';
+ if(process.argv.includes('--check'))assert.equal(fs.readFileSync('assets/pampuch-native.js','utf8'),native);
+ else fs.writeFileSync('assets/pampuch-native.js',native);
+}
 console.log('Original hash, eleven maps and thirteen bitmaps verified.');

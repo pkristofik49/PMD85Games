@@ -15,6 +15,12 @@ async function press(code,key){await call('Input.dispatchKeyEvent',{type:'keyDow
 const base=process.argv[2]||'http://127.0.0.1:4173/PMD85Games/';
 try{
  await call('Page.enable');await call('Runtime.enable');await call('Network.enable');
+ const instrumentation=await call('Page.addScriptToEvaluateOnNewDocument',{source:`
+ window.__pmdAudioContexts=[];window.__pmdBuffers=[];
+ if(window.AudioContext){const Native=window.AudioContext;window.AudioContext=class extends Native{
+  constructor(...args){super(...args);window.__pmdAudioContexts.push(this);}
+  createBuffer(...args){const buffer=super.createBuffer(...args);window.__pmdBuffers.push(buffer);return buffer;}
+ };}`});
  await call('Page.navigate',{url:'about:blank'});await delay(150);
  await call('Storage.clearDataForOrigin',{origin:new URL(base).origin,storageTypes:'all'});
  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
@@ -29,14 +35,22 @@ try{
  }
  await evaluate(`document.querySelector('[data-game="pampuch"]').click()`);
  await until(`document.querySelector('canvas[data-state="ready"]')`);
+ assert.equal(await evaluate('window.__pmdAudioContexts.length'),0,'No audio context before user interaction');
+ await press('KeyZ','z');await until(`window.__pmdAudioContexts[0]?.state==='running'`);
  await screenshot('pampuch-ready.png');
  await evaluate(`document.querySelector('.primary-button').click()`);
  await until(`document.querySelector('canvas[data-state="playing"]')`);
- await delay(380);await press('KeyP','p');
+ await delay(380);
+ await call('Input.dispatchKeyEvent',{type:'keyDown',code:'ArrowUp',key:'ArrowUp'});await delay(60);
+ await call('Input.dispatchKeyEvent',{type:'keyUp',code:'ArrowUp',key:'ArrowUp'});
+ await press('KeyP','p');
  await until(`document.querySelector('canvas[data-state="paused"]')`);
- const paused=await evaluate(`JSON.parse(localStorage.getItem('pmd85games.pampuch.v1'))`);
- assert.ok(paused.score>0);await delay(300);
- assert.equal(await evaluate(`JSON.parse(localStorage.getItem('pmd85games.pampuch.v1')).time`),paused.time);
+ const paused=await evaluate(`localStorage.getItem('pmd85games.pampuch.v2')`);
+ assert.equal(JSON.parse(paused).machine.ram[0xc69],1,'Held key reaches native keyboard scan');
+ assert.ok(await evaluate(`Number(document.querySelector('.scores strong').textContent)>0`));
+ assert.equal(await evaluate(`window.__pmdBuffers.some(b=>b.getChannelData(0).some(v=>v>0))`),true,'Native port waveform reached Web Audio');
+ await delay(300);
+ assert.equal(await evaluate(`localStorage.getItem('pmd85games.pampuch.v2')`),paused);
  await screenshot('pampuch-paused.png');
  await evaluate(`document.querySelector('.primary-button').click()`);await delay(130);
  await press('KeyN','n');await until(`document.querySelector('.secondary-button')`);
@@ -76,6 +90,7 @@ try{
  await evaluate(`location.hash='#/flappy'`);await until(`document.querySelector('iframe')?.contentDocument.querySelector('.title-screen img')?.naturalWidth>0`);
  await evaluate(`location.hash='#/pampuch'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  assert.equal(errors.length,0,errors.join('\n'));
+ await call('Page.removeScriptToEvaluateOnNewDocument',{identifier:instrumentation.identifier});
  console.log('Browser checks passed: desktop, mobile, gameplay, pause, reload, translations, palettes, Flappy and both games offline.');
 }finally{
  await call('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});ws.close();

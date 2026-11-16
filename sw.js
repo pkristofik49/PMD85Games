@@ -1,7 +1,8 @@
-const RELEASE = '1.002';
+const RELEASE = '1.003';
 const SHELL = [
   "./",
   "assets/pampuch-data.js",
+  "assets/pampuch-native.js",
   "commit.json",
   "games/flappy/assets/README.md",
   "games/flappy/assets/game-data.js",
@@ -53,14 +54,17 @@ const SHELL = [
   "index.html",
   "js/app.js",
   "js/audio.js",
+  "js/i8080.js",
   "js/pampuch-render.js",
   "js/pampuch.js",
   "js/pixel-font.js",
+  "js/pmd85.js",
   "js/pwa.js",
   "js/translations.js",
   "js/version.js",
   "manifest.webmanifest",
   "styles.css",
+  "vendor/LICENSE.pmd-timing",
   "vendor/LICENSE.vue",
   "vendor/vue.global.prod.js"
 ];

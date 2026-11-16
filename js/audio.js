@@ -1,21 +1,30 @@
+﻿/* PCM comes from the original program's PIO writes and PMD divider phase. */
 (() => {
+  function pcm(chunk,rate){
+    const clock=2048000,first=Math.ceil(chunk.start*rate/clock),last=Math.ceil(chunk.end*rate/clock);
+    const samples=new Float32Array(Math.max(0,last-first));let control=chunk.control,edge=0;
+    for(let i=0;i<samples.length;i++){
+      const cycle=(first+i)*clock/rate;
+      while(edge<chunk.edges.length&&chunk.edges[edge][0]<=cycle)control=chunk.edges[edge++][1];
+      const high=(control&4)||((control&2)&&(Math.floor(cycle/256)&1))||((control&1)&&(Math.floor(cycle/1024)&1));
+      samples[i]=high?.12:0;
+    }
+    return{samples,first};
+  }
   class Audio {
-    constructor(){this.context=null;this.nodes=new Set();this.enabled=false;}
+    constructor(){this.context=null;this.nodes=new Set();this.enabled=false;this.baseSample=null;this.baseTime=0;}
     unlock(){if(!this.enabled)return;try{this.context??=new (window.AudioContext||window.webkitAudioContext)();void this.context.resume().catch(()=>{});}catch{}}
-    stop(){for(const node of this.nodes){try{node.stop();}catch{}}this.nodes.clear();}
-    play(name){
-      if(!this.enabled||!this.context||this.context.state!=='running')return;
-      const notes={step:[[110,.012]],ring:[[880,.035],[1320,.035]],start:[[330,.07],[440,.07],[660,.12]],
-        death:[[660,.08],[440,.08],[220,.13],[110,.2]],level:[[440,.08],[550,.08],[660,.08],[880,.2]]}[name];
-      if(!notes)return;let at=this.context.currentTime;
-      for(const [frequency,duration]of notes){const oscillator=this.context.createOscillator(),gain=this.context.createGain();
-        oscillator.type='square';oscillator.frequency.value=frequency;gain.gain.setValueAtTime(.018,at);
-        gain.gain.setValueAtTime(.018,at+duration*.7);gain.gain.linearRampToValueAtTime(0,at+duration);
-        oscillator.connect(gain);gain.connect(this.context.destination);this.nodes.add(oscillator);
-        oscillator.onended=()=>{this.nodes.delete(oscillator);oscillator.disconnect();gain.disconnect();};
-        oscillator.start(at);oscillator.stop(at+duration);at+=duration;
-      }
+    stop(){for(const node of this.nodes){try{node.stop();}catch{}}this.nodes.clear();this.baseSample=null;}
+    play(chunk){
+      if(!this.enabled||!this.context||this.context.state!=='running'||!chunk||chunk.end<=chunk.start)return;
+      const rate=this.context.sampleRate,{samples,first}=pcm(chunk,rate);if(!samples.length)return;
+      const now=this.context.currentTime;
+      if(this.baseSample===null||this.baseTime+(first-this.baseSample)/rate<now){this.baseSample=first;this.baseTime=now+.045;}
+      const buffer=this.context.createBuffer(1,samples.length,rate);buffer.copyToChannel(samples,0);
+      const source=this.context.createBufferSource();source.buffer=buffer;source.connect(this.context.destination);
+      this.nodes.add(source);source.onended=()=>{this.nodes.delete(source);source.disconnect();};
+      source.start(this.baseTime+(first-this.baseSample)/rate);
     }
   }
-  globalThis.PmdAudio=Audio;
+  globalThis.PmdAudio=Audio;globalThis.PmdPCM=pcm;
 })();

@@ -3,6 +3,7 @@
 - Follow the SMG structure: static HTML/CSS, classic scripts in `js/`, local Vue in `vendor/`. Vue is the only runtime library. Use native Canvas, Web Audio, storage and browser APIs; no package installation or build dependency.
 - Keep the first menu card Flappy and the second Pampuch. Preserve the imported Flappy runtime under `games/flappy/`; document integration changes in `SOURCES.md`.
 - Keep original Pampuch data separate in `assets/pampuch-data.js`. Record provenance and fidelity limits in `SOURCES.md`; do not describe approximate timing or sound as cycle-exact.
+- Pampuch gameplay executes the original program/monitor in `assets/pampuch-native.js` through the custom `js/i8080.js` and `js/pmd85.js` core. Preserve instruction timing, framebuffer collisions and PIO audio. Never replace these with geometric collision rules, fixed movement intervals or invented sound effects. Validate native behavior against the independent C-generated trace and CPU diagnostics.
 - After adding or removing runtime resources, run `node tools/update-shell.mjs`. The root service worker caches both games; embedded Flappy must not register its own worker.
 - Use `node tools/check.mjs` and `node --test tests/*.test.mjs` for shared/Pampuch changes. Run the imported Flappy tests when its runtime changes.
 

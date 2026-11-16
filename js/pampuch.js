@@ -1,94 +1,42 @@
-/* Native maps and sprites, with a half-cell simulation independent of rendering. */
+﻿/* Original Pampuch rules execute on the PMD core; the browser adds pause/save. */
 (() => {
-  const directions = {up:[0,-1], right:[1,0], down:[0,1], left:[-1,0]};
-  const overlap = (a,b) => a.x < b.x+2 && a.x+2 > b.x && a.y < b.y+2 && a.y+2 > b.y;
+  const SAVE_VERSION=2,STOP_GAME_OVER=0x08bd;
   class Pampuch {
-    constructor() { this.level=1; this.score=0; this.lives=5; this.state='ready'; this.events=[]; this.load(); }
-    load() {
-      this.map=globalThis.PampuchData.levels[(this.level-1)%11];
-      this.rings=new Set(); this.tombs=[]; this.time=500; this.ticks=0; this.blocked=0;
-      this.map.rows.forEach((row,y)=>[...row].forEach((v,x)=>{if(v==='.')this.rings.add(`${x},${y}`);}));
-      // Original maps deliberately include inaccessible decorative rings.
-      this.rings.delete('11,16');this.remaining=this.map.target; this.spawn();
+    constructor(){this.machine=new Pmd85();this.machine.boot();this.state='ready';this.events=[];this.ticks=0;this.startedAt=this.machine.cpu.cycles;}
+    get level(){return this.machine.memory[0x0b48];}
+    get score(){const m=this.machine.memory;return m[0x0b4b]*10000+m[0x0b4c]*100+m[0x0b4d];}
+    get lives(){return this.state==='over'?0:this.machine.memory[0x0c7c];}
+    get time(){const m=this.machine.memory;return m[0x0b49]*100+m[0x0b4a];}
+    get remaining(){const value=this.machine.word(0x0c6c);return value>432?0:value;}
+    get player(){return this.actor(0x0c6a);}
+    get ghosts(){return [0x0c6e,0x0c70,0x0c72,0x0c74].map(a=>this.actor(a));}
+    actor(address){const pointer=this.machine.word(address)-0xc000;return{x:(pointer&63),y:(Math.floor(pointer/64)-24)/6};}
+    start(){if(this.state==='ready')this.state='playing';}
+    turn(direction,pressed=true){if(this.state==='playing')this.machine.key(direction,pressed);}
+    release(){this.machine.release();}
+    takeEvents(){return this.events.splice(0);}
+    advance(milliseconds){
+      if(this.state!=='playing'||!Number.isFinite(milliseconds)||milliseconds<=0)return;
+      const start=this.machine.cpu.cycles,control=this.machine.portC&7;
+      this.machine.advance(milliseconds*Pmd85.CLOCK/1000,{stopAt:STOP_GAME_OVER});this.ticks++;
+      this.events.push({start,end:this.machine.cpu.cycles,control,edges:this.machine.edges.splice(0)});
+      if(this.machine.cpu.pc===STOP_GAME_OVER){this.state='over';this.release();}
     }
-    spawn() {
-      this.player={x:22,y:32,direction:'right'};
-      this.ghosts=[{x:2,y:2,direction:'right'},{x:44,y:2,direction:'down'},
-        {x:2,y:32,direction:'left'},{x:44,y:32,direction:'up'}];
-    }
-    emit(name) { this.events.push(name); }
-    takeEvents() { return this.events.splice(0); }
-    start() { if(this.state==='ready'){this.state='playing';this.emit('start');} }
-    canMove(actor,direction) {
-      const [dx,dy]=directions[direction], next={x:actor.x+dx,y:actor.y+dy};
-      for(let y=Math.floor(next.y/2);y<=Math.floor((next.y+1)/2);y++)
-        for(let x=Math.floor(next.x/2);x<=Math.floor((next.x+1)/2);x++)
-          if(this.map.rows[y]?.[x]!=='.')return false;
-      return !this.tombs.some(t=>overlap(next,t));
-    }
-    move(actor,direction) {
-      if(!this.canMove(actor,direction))return false;
-      const [dx,dy]=directions[direction];actor.x+=dx;actor.y+=dy;actor.direction=direction;return true;
-    }
-    turn(direction) { if(directions[direction])this.player.direction=direction; }
-    collect() {
-      // Collect at the leading half-step, before reaching the centre of the cell.
-      const p=this.player;
-      for(const key of this.rings) {
-        const [x,y]=key.split(',').map(Number);
-        if(Math.abs(p.x-x*2)+Math.abs(p.y-y*2)>1)continue;
-        this.rings.delete(key);this.remaining--;this.score++;this.time=Math.min(9999,this.time+4);this.emit('ring');
-      }
-      if(this.remaining<=0){this.state='level';this.emit('level');}
-    }
-    ghostMove(ghost) {
-      // Translate the original direction-first chase: only turn after a blockage.
-      let direction=ghost.direction;
-      for(let attempt=0;attempt<5;attempt++) {
-        if(this.move(ghost,direction)){this.blocked=0;return;}
-        this.blocked=(this.blocked+1)%5;if(this.blocked===0)return;
-        if(direction==='left'||direction==='right')
-          direction=this.player.y<ghost.y?'up':'down';
-        else direction=this.player.x<ghost.x?'left':'right';
-      }
-    }
-    die() {
-      if(this.state!=='playing')return;
-      this.tombs.push({x:this.player.x,y:this.player.y});this.lives--;this.state=this.lives?'dead':'over';this.emit('death');
-    }
-    continue() {
-      if(this.state==='dead'){this.spawn();this.state='playing';this.emit('start');}
-      else if(this.state==='level'){
-        if(((this.level-1)%11+1)%4===0)this.lives++;this.level++;
-        this.load();this.state='playing';this.emit('start');
-      }
-    }
-    tick() {
-      if(this.state!=='playing')return;
-      this.ticks++;if(this.time===0){this.lives=1;this.die();return;}this.time--;
-      if(this.move(this.player,this.player.direction))this.emit('step');
-      if(this.ghosts.some(g=>overlap(g,this.player))){this.die();return;}
-      this.collect();if(this.state!=='playing')return;
-      for(const ghost of this.ghosts){this.ghostMove(ghost);if(overlap(ghost,this.player)){this.die();return;}}
-    }
-    snapshot() { return {version:1,level:this.level,score:this.score,lives:this.lives,state:this.state,
-      player:this.player,ghosts:this.ghosts,rings:[...this.rings],tombs:this.tombs,time:this.time,
-      ticks:this.ticks,remaining:this.remaining,blocked:this.blocked}; }
-    static restore(value) {
-      if(!value||value.version!==1)return null;
-      const integer=(n,a,b)=>Number.isInteger(n)&&n>=a&&n<=b;
-      if(!integer(value.level,1,10000)||!integer(value.score,0,1e9)||!integer(value.lives,0,10000)||
-        !integer(value.time,0,9999)||!integer(value.ticks,0,1e9)||!integer(value.remaining,0,432)||
-        !integer(value.blocked,0,4)||!['ready','playing','paused','dead','over','level'].includes(value.state))return null;
-      const actor=p=>p&&integer(p.x,0,46)&&integer(p.y,0,34);
-      if(!actor(value.player)||!directions[value.player.direction]||!Array.isArray(value.ghosts)||value.ghosts.length!==4||
-        !value.ghosts.every(p=>actor(p)&&directions[p.direction])||!Array.isArray(value.tombs)||!value.tombs.every(actor)||
-        !Array.isArray(value.rings)||value.rings.length>432)return null;
-      const game=new Pampuch();game.level=value.level;game.load();
-      if(!value.rings.every(key=>typeof key==='string'&&game.rings.has(key)))return null;
-      for(const key of ['level','score','lives','state','player','ghosts','tombs','time','ticks','remaining','blocked'])game[key]=value[key];
-      game.rings=new Set(value.rings);game.events=[];
-      if(game.state==='playing')game.state='paused';return game;
+    snapshot(){return{version:SAVE_VERSION,state:this.state,ticks:this.ticks,startedAt:this.startedAt,machine:this.machine.snapshot()};}
+    static restore(value){
+      if(!value||value.version!==SAVE_VERSION||!['ready','playing','paused','over'].includes(value.state))return null;
+      const integer=(n,lo,hi)=>Number.isInteger(n)&&n>=lo&&n<=hi;
+      const s=value.machine,c=s?.cpu;
+      if(!s||!c||!Array.isArray(s.ram)||s.ram.length!==49152||!s.ram.every(n=>integer(n,0,255))||
+        !Array.isArray(c.r)||c.r.length!==8||!c.r.every(n=>integer(n,0,255))||
+        !integer(c.pc,0,65535)||!integer(c.sp,0,65535)||!integer(c.f,0,255)||!integer(c.cycles,0,Number.MAX_SAFE_INTEGER)||
+        typeof c.halted!=='boolean'||typeof c.interrupts!=='boolean'||
+        !['portA','portC','control'].every(k=>integer(s[k],0,255))||
+        !Number.isFinite(s.targetCycles)||s.targetCycles<0||s.targetCycles>Number.MAX_SAFE_INTEGER||
+        (value.state!=='over'&&(s.targetCycles>c.cycles||s.targetCycles<c.cycles-32))||
+        !integer(value.ticks,0,Number.MAX_SAFE_INTEGER)||!integer(value.startedAt,0,c.cycles))return null;
+      const game=new Pampuch();game.machine.restore(s);game.ticks=value.ticks;game.startedAt=value.startedAt;
+      game.state=value.state==='playing'?'paused':value.state;return game;
     }
   }
   globalThis.Pampuch=Pampuch;

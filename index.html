@@ -12,9 +12,12 @@
   <link rel="stylesheet" href="styles.css">
   <script defer src="vendor/vue.global.prod.js"></script>
   <script defer src="assets/pampuch-data.js"></script>
+  <script defer src="assets/pampuch-native.js"></script>
   <script defer src="js/translations.js"></script>
   <script defer src="js/version.js"></script>
   <script defer src="js/pixel-font.js"></script>
+  <script defer src="js/i8080.js"></script>
+  <script defer src="js/pmd85.js"></script>
   <script defer src="js/pampuch.js"></script>
   <script defer src="js/pampuch-render.js"></script>
   <script defer src="js/audio.js"></script>
@@ -71,7 +74,7 @@
             <div class="machine-bottom"><span>TESLA · PIEŠŤANY</span><span>DUŠAN BLAŠKO / 1986</span></div>
           </div>
           <div class="below-board"><span>{{ t('levelLabel') }} <strong>{{ level }}</strong></span><span>{{ t('lives') }} <strong>{{ lives }}</strong></span><span>{{ t('rings') }} <strong>{{ remaining }}</strong></span></div>
-          <div class="direction-pad" role="group" :aria-label="t('controls')"><button v-for="d in touchDirections" :class="d.name" :aria-label="t(d.name)" @pointerdown.prevent="touchMove(d.name,$event)" @contextmenu.prevent>{{ d.symbol }}</button></div>
+          <div class="direction-pad" role="group" :aria-label="t('controls')"><button v-for="d in touchDirections" :class="d.name" :aria-label="t(d.name)" @pointerdown.prevent="touchMove(d.name,$event)" @pointerup="releaseDirection(d.name)" @pointercancel="releaseDirection(d.name)" @lostpointercapture="releaseDirection(d.name)" @contextmenu.prevent>{{ d.symbol }}</button></div>
           <p class="save-note" :class="{'storage-warning':!storageAvailable}">{{ t(storageAvailable?'saved':'notSaved') }}</p>
           <p class="sr-only" role="status" aria-live="polite">{{ announcement }}</p>
         </section>

@@ -13,14 +13,14 @@
     const status=ref('ready'),score=ref(0),level=ref(1),lives=ref(5),remaining=ref(0),announcement=ref('');
     const storedBest=Number(read('pampuch.best','0'));const best=ref(Number.isSafeInteger(storedBest)&&storedBest>=0?storedBest:0);
     const version=ArcadeVersion,commit=ref(''),isFile=location.protocol==='file:',year=new Date().getFullYear();
-    let game;try{game=Pampuch.restore(JSON.parse(read('pampuch.v1','null')));}catch{}game??=new Pampuch();
-    let frameId,last=0,elapsed=0,previousState='',stateBeforeConfirm='ready',lastSavedTick=-1;
+    let game;try{game=Pampuch.restore(JSON.parse(read('pampuch.v2','null')));}catch{}game??=new Pampuch();
+    let frameId,last=0,previousState='',stateBeforeConfirm='ready',lastSavedAt=0;
     const t=key=>PmdTranslations[language.value][key]??key;
     const overlayKey=computed(()=>confirmRestart.value?'confirm':({ready:'ready',paused:'paused',dead:'dead',over:'over',level:'level'}[status.value]??'ready'));
     const overlayTitle=computed(()=>t(overlayKey.value));const overlayText=computed(()=>t(overlayKey.value+'Text'));
     const primaryText=computed(()=>t(confirmRestart.value?'new':status.value==='ready'?'start':status.value==='over'?'new':status.value==='level'?'next':'resume'));
     const touchDirections=[{name:'up',symbol:'↑'},{name:'left',symbol:'←'},{name:'down',symbol:'↓'},{name:'right',symbol:'→'}];
-    function save(){write('pampuch.v1',JSON.stringify(game.snapshot()));}
+    function save(){write('pampuch.v2',JSON.stringify(game.snapshot()));}
     function paint(){if(board.value)PampuchRender.render(board.value.getContext('2d'),game,best.value);}
     function sync(){
       status.value=game.state;score.value=game.score;level.value=game.level;lives.value=game.lives;remaining.value=game.remaining;
@@ -36,12 +36,12 @@
       if(confirmRestart.value||game.state==='over'){game=new Pampuch();game.start();confirmRestart.value=false;}
       else if(game.state==='paused')game.state='playing';
       else if(game.state==='ready')game.start();else game.continue();
-      elapsed=0;sync();save();void nextTick(()=>board.value?.focus({preventScroll:true}));
+      last=performance.now();game.release();sync();save();void nextTick(()=>board.value?.focus({preventScroll:true}));
     }
-    function pause(){if(game.state==='playing'){game.state='paused';audio.stop();elapsed=0;sync();save();}}
+    function pause(){game.release();if(game.state==='playing'){game.state='paused';audio.stop();sync();save();}}
     function togglePause(){if(confirmRestart.value)return;if(game.state==='playing')pause();else if(game.state==='paused')primaryAction();}
     function requestRestart(){if(confirmRestart.value)return;stateBeforeConfirm=game.state;pause();confirmRestart.value=true;audio.stop();void nextTick(()=>primary.value?.focus());}
-    function cancelRestart(){confirmRestart.value=false;game.state=stateBeforeConfirm;elapsed=0;sync();save();void nextTick(()=>board.value?.focus({preventScroll:true}));}
+    function cancelRestart(){confirmRestart.value=false;game.state=stateBeforeConfirm;last=performance.now();sync();save();void nextTick(()=>board.value?.focus({preventScroll:true}));}
     function toggleSound(){sound.value=!sound.value;audio.enabled=sound.value;write('sound',String(sound.value));if(sound.value)audio.unlock();else audio.stop();}
     function route(){
       pause();confirmRestart.value=false;expanded.value=false;audio.stop();
@@ -49,7 +49,10 @@
       const path=location.hash.replace(/^#\/?/,'').replace(/\/$/,'');page.value=path||'menu';
       void nextTick(()=>{if(page.value==='menu')menuPreview();else if(page.value==='pampuch')sync();});
     }
-    function touchMove(direction,event){audio.unlock();if(game.state!=='playing'||confirmRestart.value)return;event.currentTarget.setPointerCapture?.(event.pointerId);game.turn(direction);focusBoard();}
+    function flushInputClock(){const now=performance.now();if(page.value==='pampuch'&&!document.hidden&&!confirmRestart.value&&game.state==='playing'){game.advance(Math.min(now-(last||now),250));sync();}last=now;}
+    function touchMove(direction,event){audio.unlock();if(game.state!=='playing'||confirmRestart.value)return;flushInputClock();event.currentTarget.setPointerCapture?.(event.pointerId);game.turn(direction);focusBoard();}
+    function releaseDirection(direction){flushInputClock();game.turn(direction,false);}
+    function keyup(event){if(keyDirections[event.code])releaseDirection(keyDirections[event.code]);}
     function trapFocus(event){const buttons=event.currentTarget.querySelectorAll('button');const first=buttons[0],lastButton=buttons[buttons.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();lastButton.focus();}else if(!event.shiftKey&&document.activeElement===lastButton){event.preventDefault();first.focus();}}
     const keyDirections={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',KeyW:'up',KeyS:'down',KeyA:'left',KeyD:'right'};
     function keydown(event){
@@ -67,20 +70,16 @@
       if(['KeyP','Escape'].includes(event.code)){event.preventDefault();if(!event.repeat)togglePause();return;}
       if(event.target.closest?.('button,a'))return;
       if(['Enter','Space'].includes(event.code)&&game.state!=='playing'){event.preventDefault();if(!event.repeat)primaryAction();return;}
-      if(keyDirections[event.code]){event.preventDefault();if(game.state==='playing')game.turn(keyDirections[event.code]);}
+      if(keyDirections[event.code]){event.preventDefault();if(game.state==='playing'){flushInputClock();game.turn(keyDirections[event.code]);}}
     }
     function visibility(){if(document.hidden)pause();}
     function blur(){pause();audio.stop();}
     function frame(now){
       const dt=Math.min(now-(last||now),250);last=now;
       if(page.value==='pampuch'&&!document.hidden&&!confirmRestart.value&&game.state==='playing'){
-        elapsed+=dt;
-        // Native speed-ups occur every four maps. The browser clock is bounded.
-        const speedUps=Math.floor((game.level-1)/11)*2+Math.floor(((game.level-1)%11)/4);
-        const interval=Math.max(48,120-8*speedUps);
-        while(elapsed>=interval&&game.state==='playing'){elapsed-=interval;game.tick();sync();}
-        if(game.ticks%10===0&&game.ticks!==lastSavedTick){save();lastSavedTick=game.ticks;}
-      }else elapsed=0;
+        game.advance(dt);sync();
+        if(now-lastSavedAt>=1000){save();lastSavedAt=now;}
+      }
       frameId=requestAnimationFrame(frame);
     }
     watch(language,()=>{write('language',language.value);document.documentElement.lang=language.value;document.querySelector('meta[name="description"]').content=t('description');document.title='PMD 85 Games';});
@@ -89,10 +88,10 @@
     onMounted(()=>{
       document.documentElement.lang=language.value;document.documentElement.dataset.palette=palette.value;
       route();frameId=requestAnimationFrame(frame);
-      window.addEventListener('hashchange',route);window.addEventListener('keydown',keydown);window.addEventListener('blur',blur);window.addEventListener('pagehide',save);document.addEventListener('visibilitychange',visibility);
+      window.addEventListener('hashchange',route);window.addEventListener('keydown',keydown);window.addEventListener('keyup',keyup);window.addEventListener('blur',blur);window.addEventListener('pagehide',save);document.addEventListener('visibilitychange',visibility);
       if(!isFile)fetch('commit.json',{cache:'no-cache'}).then(r=>r.json()).then(m=>{if(m.version===version&&/^[a-f0-9]{7,40}$/.test(m.commit))commit.value=m.commit.slice(0,7);}).catch(()=>{});
     });
-    onUnmounted(()=>{cancelAnimationFrame(frameId);audio.stop();window.removeEventListener('hashchange',route);window.removeEventListener('keydown',keydown);window.removeEventListener('blur',blur);window.removeEventListener('pagehide',save);document.removeEventListener('visibilitychange',visibility);});
-    return{t,language,palette,palettes,sound,toggleSound,page,board,preview,primary,flappy,expanded,showHelp,confirmRestart,status,score,best,level,lives,remaining,announcement,version,commit,isFile,year,touchDirections,overlayTitle,overlayText,primaryText,primaryAction,togglePause,requestRestart,cancelRestart,focusBoard,touchMove,trapFocus,storageAvailable};
+    onUnmounted(()=>{cancelAnimationFrame(frameId);audio.stop();window.removeEventListener('hashchange',route);window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);window.removeEventListener('pagehide',save);document.removeEventListener('visibilitychange',visibility);});
+    return{t,language,palette,palettes,sound,toggleSound,page,board,preview,primary,flappy,expanded,showHelp,confirmRestart,status,score,best,level,lives,remaining,announcement,version,commit,isFile,year,touchDirections,overlayTitle,overlayText,primaryText,primaryAction,togglePause,requestRestart,cancelRestart,focusBoard,touchMove,releaseDirection,trapFocus,storageAvailable};
   }}).mount('#app');
 })();
