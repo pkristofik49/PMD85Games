@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtempSync,mkdirSync,copyFileSync,readFileSync,writeFileSync,rmSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,copyFileSync,chmodSync,readFileSync,writeFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -10,6 +10,7 @@ test('Commit hook starts at 1.000, increments, survives failed attempts and roll
  try{
   git('init','-b','main');git('config','user.name','Hook Test');git('config','user.email','test@example.invalid');git('config','commit.gpgsign','false');git('config','core.hooksPath','.githooks');git('config','core.autocrlf','false');
   mkdirSync(path.join(dir,'.githooks'));copyFileSync(new URL('../.githooks/pre-commit',import.meta.url),path.join(dir,'.githooks/pre-commit'));
+  chmodSync(path.join(dir,'.githooks/pre-commit'),0o755);
   writeFileSync(path.join(dir,'VERSION'),'1.000\n');writeFileSync(path.join(dir,'version.js'),'globalThis.FLAPPY_VERSION = "1.000";\n');git('add','.');git('update-index','--chmod=+x','.githooks/pre-commit');git('commit','-m','initial');
   assert.equal(git('show','HEAD:VERSION').trim(),'1.000');
   writeFileSync(path.join(dir,'game.txt'),'change');git('add','game.txt');git('commit','-m','second');assert.equal(git('show','HEAD:VERSION').trim(),'1.001');

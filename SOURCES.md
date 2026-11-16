@@ -18,6 +18,8 @@ the upstream GitHub workflow are not embedded. The only runtime integration
 change: `src/app.js` registers its worker only in a top-level document. The root
 worker caches its entire runtime for embedded offline use. It retains its own
 settings and version. The collection's pixel font is adapted from Flappy.
+The imported version-hook test additionally sets its temporary hook executable
+on POSIX; staging Git's executable bit alone does not change filesystem mode.
 
 Original artwork, platform graphics and sound limitations are documented in
 [the imported SOURCES.md](games/flappy/SOURCES.md).
