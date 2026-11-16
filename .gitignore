@@ -1,0 +1,5 @@
+.reference/
+.tools/
+test-results/
+dist/
+node_modules/

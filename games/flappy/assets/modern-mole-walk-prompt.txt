@@ -1,0 +1,21 @@
+Use case: stylized-concept.
+Asset type: production 16-frame walking animation atlas, RGBA transparent.
+Reference image: character identity and drawing style ONLY. Use the BROWN MOLE from the top two rows of the supplied image. Do not include any frog, ghost, rock, mushroom or egg.
+Create a NEW square high-resolution 4 COLUMNS x 4 ROWS sprite sheet with exactly 16 mole frames, one mole per equal cell, centered, fully contained with at least 20px transparent margin. Consistent fixed character scale and torso/head placement in every cell. Clean transparent background, alpha zero everywhere outside silhouettes, no halos, no ground shadows, no cell borders, no text.
+Identity: brown-grey velvet-furred round mole, pale taupe belly, pink rounded snout with nostrils, tiny black eyes, small pink ears, TWO broad pink clawed HANDS held at the front of torso, TWO short hind LEGS with distinct pink FEET beneath the body. Same polished outlined hand-painted cartoon style as reference. It is a biped walking on the TWO HIND FEET, not crawling on its hands.
+CRITICAL WALK REQUIREMENT: Show both the near-side and far-side hind feet, visibly separated. Alternate which foot extends forward and which is behind. Near-side foot is slightly darker pink and drawn in front; far-side foot is slightly lighter and partially behind, but still visible. At the opposite contact frame the far-side foot leads forward while the near-side foot trails behind. Do NOT repeat the same lifted foot. Hands may swing slightly opposite to the legs but are not the main walking legs.
+Read left-to-right then top-to-bottom:
+ROW 1: mole facing LEFT frames L0 L1 L2 L3.
+ROW 2: mole facing LEFT frames L4 L5 L6 L7.
+ROW 3: mole facing RIGHT frames R0 R1 R2 R3.
+ROW 4: mole facing RIGHT frames R4 R5 R6 R7.
+For each direction the 8-frame loop:
+0 contact: near-side foot extended forward, far-side foot back, both touching ground.
+1 down: near-side foot planted accepting weight, far-side heel lifts behind.
+2 passing: far-side knee passes under body, near-side foot supporting.
+3 up: far-side foot extends forward in air, near-side foot trails.
+4 opposite contact: FAR-SIDE foot extended forward and near-side foot BACK, both touching ground; visibly reversed from frame 0.
+5 opposite down: far-side foot planted, near-side heel lifts behind.
+6 opposite passing: near-side knee passes under body, far-side foot supporting.
+7 opposite up: near-side foot extends forward in air, far-side foot trails; loops back to 0.
+Snout points LEFT in all L frames and RIGHT in all R frames. Do not turn toward viewer. Keep head, snout and chest stable so only legs and slight arm swing animate. Small natural body rise/fall only. No floor, no scenery, no other objects. Actual transparency, crisp clean edges, readable when scaled to about 64x64 pixels.

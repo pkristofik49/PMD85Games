@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#171a17">
+  <!-- Static copy is generated from src/translations.js by tools/localize-static.mjs. -->
+  <meta name="description" content="Flappy pro PMD 85. Dvě stě původních logických místností v původní i moderní grafice, na webu i offline.">
+  <link id="pwa-manifest" rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png">
+  <link rel="stylesheet" href="./style.css">
+  <title>FLAPPY · PMD 85</title>
+</head>
+<body>
+  <div id="app" v-cloak><div class="application" :class="{ 'expanded-mode': expanded, 'mobile-landscape': mobileLandscape }" :style="{ '--expanded-machine-width': expandedWidth + 'px' }">
+    <header class="masthead">
+      <a class="wordmark" href="./" :aria-label="t('brand.home')"><span class="mark">{{ t('brand.mark') }}</span> {{ t('brand.name') }}<span class="edition">{{ t('graphics.' + graphics) }}</span></a>
+      <div class="header-actions">
+        <button v-if="installPrompt" class="text-button" @click="install">{{ t('action.install') }} ↗</button>
+        <div class="global-controls">
+          <div ref="languagePicker" class="language-picker" @focusout="onPickerBlur">
+            <button ref="languageMenuButton" type="button" class="language-menu-toggle topbar-button" aria-keyshortcuts="L" :aria-label="t('language.change')" :title="shortcutTitle('language.change','L')" aria-controls="language-options" :aria-expanded="languageMenuOpen" @click="toggleLanguageMenu"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z"/></svg></button>
+            <Transition name="toolbar-menu"><div id="language-options" v-show="languageMenuOpen" :aria-hidden="!languageMenuOpen" :inert="!languageMenuOpen" class="language-switch" role="group" :aria-label="t('language.change')">
+              <button v-for="option in languages" :key="option.code" type="button" :lang="option.code" :aria-label="option.name" :aria-pressed="language === option.code" :data-language="option.code" data-option @click="setLanguage(option.code)">{{ option.name }}</button>
+            </div></Transition>
+          </div>
+          <div ref="graphicsPicker" class="language-picker graphics-picker" @focusout="onPickerBlur">
+            <button ref="graphicsMenuButton" type="button" class="graphics-menu-toggle topbar-button" aria-keyshortcuts="G" :aria-label="t('graphics.change')" :title="shortcutTitle('graphics.change','G')" aria-controls="graphics-options" :aria-expanded="graphicsMenuOpen" @click="toggleGraphicsMenu"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-3.7 1.5 1.5 0 0 1 1-2.8h2A4 4 0 0 0 21 10c0-4-4-7-9-7Z"/><circle cx="7" cy="10" r=".8"/><circle cx="10" cy="6.8" r=".8"/><circle cx="15" cy="7" r=".8"/><circle cx="17.5" cy="10.5" r=".8"/></svg></button>
+            <Transition name="toolbar-menu"><div id="graphics-options" v-show="graphicsMenuOpen" :aria-hidden="!graphicsMenuOpen" :inert="!graphicsMenuOpen" class="language-switch graphics-switch" role="group" :aria-label="t('graphics.change')">
+              <button v-for="option in graphicsModes" :key="option" type="button" :data-graphics="option" data-option :aria-pressed="graphics === option" :disabled="option === 'modern' && !graphicsReady" @click="setGraphics(option)"><span class="graphics-swatch" :class="option" aria-hidden="true"></span>{{ t('graphics.' + option) }}</button>
+            </div></Transition>
+          </div>
+          <button type="button" class="sound-button topbar-button" aria-keyshortcuts="Z" :aria-pressed="sound" :aria-label="t(audioAvailable ? (sound ? 'sound.on' : 'sound.off') : 'sound.unavailable')" :disabled="!audioAvailable" :title="audioAvailable ? shortcutTitle(sound ? 'sound.on' : 'sound.off','Z') : t('sound.unavailable')" @click="toggleSound"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4Z"/><path v-if="sound" d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/><path v-else d="m3 3 18 18"/></svg></button>
+          <button type="button" class="fullscreen-button topbar-button" aria-keyshortcuts="F" :aria-pressed="expanded" :aria-label="t(expanded ? 'view.restore' : 'view.expand')" :title="shortcutTitle(expanded ? 'view.restore' : 'view.expand','F')" @click="toggleExpanded"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path v-if="!expanded" d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/><path v-else d="M3 8h5V3m8 0v5h5M8 21v-5H3m18 0h-5v5"/></svg></button>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="intro"><div><div class="eyebrow">{{ t('intro.eyebrow') }}</div><h1>{{ t('intro.titleFirst') }}<br>{{ t('intro.titleSecond') }}<span aria-hidden="true">.</span></h1></div><p>{{ t('intro.description') }}</p></div>
+      <div class="game-layout">
+        <section class="machine" :aria-label="t('game.label')">
+          <button type="button" class="machine-top" :aria-label="t('action.titleScreen')" :title="t('action.titleScreen')" @click="returnTitle"><span><i></i> {{ t('graphics.' + graphics) }}</span><span>{{ t('game.category') }}</span></button>
+          <div class="screen-wrap" :class="{ 'show-title': mode === 'ready' }">
+            <div class="game-hud sr-only"><span>{{ t('game.scene') }} <b>{{ String(scene).padStart(3, '0') }}</b></span><span class="lives" :aria-label="plural('game.lives', lives)">{{ lives }}</span><span class="mushroom-count">{{ t('game.ammo') }} <b>{{ ammo }}</b></span><span>{{ t('game.time') }} <b>{{ timeText }}</b></span></div>
+            <div class="viewport" :style="{ aspectRatio: String(gameAspect) }">
+              <canvas ref="canvas" width="240" height="200" tabindex="0" :inert="sectorMenuOpen" :class="{ 'modern-graphics': graphics === 'modern' }" :data-graphics="graphics" :data-state="mode" :data-transition="transitionPhase || undefined" :aria-label="t('game.canvas')" @click="pauseFromBoard"></canvas>
+              <button v-if="mode === 'ready'" class="title-screen" :inert="sectorMenuOpen" @click="start" :aria-label="t('game.start')">
+                <span class="title-art"><img :src="titleScreen.src" :width="titleScreen.width" :height="titleScreen.height" :alt="t('game.titleImageMode', {version: t('graphics.' + graphics)})" fetchpriority="high" draggable="false"></span>
+                <span class="title-prompt">{{ t('game.startPrompt') }} <kbd>{{ t('key.space') }}</kbd></span>
+              </button>
+              <div v-if="!sectorMenuOpen && (mode === 'paused' || (mode === 'dead' && !lives && deathReady) || mode === 'won')" class="overlay" :class="{ 'pause-overlay': mode === 'paused' }">
+                <template v-if="mode === 'paused'"><span class="overlay-kicker">{{ t('pause.kicker') }}</span><h2>{{ t('pause.title') }}</h2><button class="primary" @click="resume">{{ t('action.resume') }} ↵</button></template>
+                <template v-if="mode === 'dead'"><span class="overlay-kicker">{{ t(lives ? 'death.tryKicker' : 'death.overKicker') }}</span><h2>{{ t(lives ? 'death.tryTitle' : 'death.overTitle') }}</h2><p>{{ message ? t(message) : '' }}</p><button class="primary" @click="retry">{{ t(lives ? 'action.retry' : 'action.newGame') }} ↵</button></template>
+                <template v-if="mode === 'won'"><span class="overlay-kicker">{{ t('win.kicker') }}</span><h2>{{ t('win.title') }}</h2><p>{{ t('win.scene', {scene}) }}{{ scene === 200 ? ' ' + t('win.finished') : '' }}</p><button class="primary" @click="next">{{ t(scene === 200 ? 'action.fromStart' : 'action.next') }} ↵</button></template>
+              </div>
+              <section v-if="sectorMenuOpen" ref="sectorOverlay" id="sector-dialog" class="sector-overlay" role="dialog" aria-modal="true" aria-labelledby="sector-title">
+                <div class="sector-heading"><h2 id="sector-title">{{ t('scene.title') }}</h2><button class="sector-close" @click="closeSectors" :aria-label="t('scene.close')" :title="t('scene.close')">×</button></div>
+                <div class="sector-scroll"><div ref="sectorGrid" class="sector-grid" role="group" :aria-label="t('scene.title')"><button v-for="n in 200" :key="n" :data-sector="n" :disabled="!accessibleScenes.includes(n)" :class="{current: n === scene}" :aria-current="n === scene ? 'true' : undefined" :aria-label="t(accessibleScenes.includes(n) ? 'scene.option' : 'scene.locked', {scene: n})" @click="chooseScene(n)">{{ n }}</button></div></div>
+                <div class="sector-footer">
+                  <small class="sector-progress">{{ t('scene.unlocked', {count: accessibleScenes.length}) }}</small>
+                  <form class="password-form" @submit.prevent="openPassword" novalidate>
+                    <label for="sector-password">{{ t('password.label') }}</label>
+                    <input id="sector-password" v-model="passwordInput" type="text" maxlength="5" autocomplete="off" autocapitalize="characters" :spellcheck="false" :aria-invalid="passwordInvalid" aria-describedby="password-hint" @input="passwordInvalid = false">
+                    <button class="password-submit" type="submit">{{ t('password.submit') }}</button>
+                    <span id="password-hint" class="sr-only">{{ t('password.hint') }}</span>
+                  </form>
+                </div>
+              </section>
+            </div>
+          </div>
+          <div class="machine-controls"><button class="pause-button" @click="togglePause" :disabled="sectorMenuOpen || (!['playing','entering','transition','paused'].includes(mode) && !(mode === 'dead' && !deathReady))">{{ mode === 'paused' ? '▶ ' + t('action.resume') : 'Ⅱ ' + t('action.pause') }} <kbd>P</kbd></button><button ref="sectorTrigger" class="sector-toggle" @click="toggleSectors" aria-haspopup="dialog" aria-controls="sector-dialog" :aria-expanded="sectorMenuOpen">{{ t('action.sectors') }}</button><button class="restart-button" @click="restart" :disabled="sectorMenuOpen">↻ {{ t('action.restart') }} <kbd>R</kbd></button></div>
+          <div class="touch-controls" :aria-label="t('touch.label')" @contextmenu.prevent @selectstart.prevent @dragstart.prevent>
+            <div class="dpad">
+              <button class="up" :aria-label="t('direction.up')" @pointerdown.prevent="hold(0,-1,$event)" @pointerup="release" @pointerleave="release" @pointercancel="release"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 6 8 11H4Z"/></svg></button>
+              <button class="left" :aria-label="t('direction.left')" @pointerdown.prevent="hold(-1,0,$event)" @pointerup="release" @pointerleave="release" @pointercancel="release"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 6 8 11H4Z"/></svg></button>
+              <span class="dpad-centre" aria-hidden="true"></span>
+              <button class="down" :aria-label="t('direction.down')" @pointerdown.prevent="hold(0,1,$event)" @pointerup="release" @pointerleave="release" @pointercancel="release"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 6 8 11H4Z"/></svg></button>
+              <button class="right" :aria-label="t('direction.right')" @pointerdown.prevent="hold(1,0,$event)" @pointerup="release" @pointerleave="release" @pointercancel="release"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 6 8 11H4Z"/></svg></button>
+            </div>
+            <button class="fire" @click="fire" :aria-label="t('action.fire') + ' ' + t('action.fireObject')" :title="t('action.fire') + ' ' + t('action.fireObject')"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M4 17C4 2 28 2 28 17Z"/><path d="M12 17v9h8v-9"/><circle cx="12" cy="11" r="1"/><circle cx="21" cy="12" r="1"/><path d="M9 26h14"/></svg></button>
+          </div>
+        </section>
+        <aside>
+          <div class="guide-heading"><span class="eyebrow">{{ t('guide.eyebrow') }}</span><span>01—03</span></div>
+          <article class="guide"><span class="step">01</span><div><h3>{{ t('guide.crystalTitle') }}</h3><p>{{ t('guide.crystalText') }}</p></div></article>
+          <article class="guide"><span class="step">02</span><div><h3>{{ t('guide.stoneTitle') }}</h3><p>{{ t('guide.stoneText') }}</p></div></article>
+          <article class="guide"><span class="step">03</span><div><h3>{{ t('guide.enemyTitle') }}</h3><p>{{ t('guide.enemyText') }}</p></div></article>
+          <div class="keys"><h3>{{ t('keys.title') }}</h3><p><span><kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></span><span>{{ t('keys.move') }}</span></p><p><kbd class="space">{{ t('key.space') }}</kbd><span>{{ t('keys.fire') }}</span></p><p><span><kbd>P</kbd> <kbd>R</kbd></span><span>{{ t('keys.pauseRestart') }}</span></p><p class="global-keys">{{ t('keys.global') }}</p></div>
+        </aside>
+      </div>
+      <p class="notice" aria-live="polite">{{ t(notice || 'notice.default') }}</p>
+      <div class="about"><span class="eyebrow">{{ t('about.eyebrow') }}</span><p>{{ t('about.text') }}</p><a href="https://www.pmd85.cz/?page_id=965" target="_blank" rel="noopener">{{ t('about.link') }} ↗</a></div>
+    </main>
+    <footer><strong>{{ t('brand.name') }} <span>{{ t('brand.version', {version}) }}</span></strong><span>{{ t('footer.credits') }}</span><a href="https://github.com/pkristofik49/Flappy" target="_blank" rel="noopener">{{ t('footer.source') }} ↗</a></footer>
+  </div></div>
+  <noscript><p lang="cs">Pro spuštění hry Flappy povol JavaScript.</p><p lang="en">Enable JavaScript to play Flappy.</p></noscript>
+  <script src="./version.js"></script>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

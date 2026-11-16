@@ -1,0 +1,21 @@
+#!/bin/sh
+set -eu
+cd "$(git rev-parse --show-toplevel)"
+# Do not consume working-tree content that was deliberately left out of the index.
+for file in VERSION version.js; do
+  if ! git diff --quiet -- "$file"; then
+    echo "Stage all changes in $file before committing." >&2
+    exit 1
+  fi
+done
+if git rev-parse --verify HEAD >/dev/null 2>&1; then
+  previous=$(git show HEAD:VERSION) || exit 1
+  next=$(printf '%s\n' "$previous" | awk -F. '/^[0-9]+\.[0-9][0-9][0-9]$/ { n=$1*1000+$2+1; printf "%d.%03d", int(n/1000), n%1000 }')
+  [ -n "$next" ] || { echo "Invalid VERSION in HEAD" >&2; exit 1; }
+else
+  next=1.000
+fi
+printf '%s\n' "$next" > VERSION
+printf 'globalThis.FLAPPY_VERSION = "%s";\n' "$next" > version.js
+git add -- VERSION version.js
+echo "Flappy version $next"

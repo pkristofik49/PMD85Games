@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="cs" data-palette="green">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f3ed">
+  <meta name="description" content="Hry z PMD 85 v prohlížeči: Flappy a Pampúch & Duch.">
+  <title>PMD 85 Games</title>
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="vendor/vue.global.prod.js"></script>
+  <script defer src="assets/pampuch-data.js"></script>
+  <script defer src="js/translations.js"></script>
+  <script defer src="js/version.js"></script>
+  <script defer src="js/pixel-font.js"></script>
+  <script defer src="js/pampuch.js"></script>
+  <script defer src="js/pampuch-render.js"></script>
+  <script defer src="js/audio.js"></script>
+  <script defer src="js/app.js"></script>
+  <script defer src="js/pwa.js"></script>
+</head>
+<body>
+  <div id="app" v-cloak><div class="application" :class="{'expanded-mode':expanded && page==='pampuch'}">
+    <header class="site-header">
+      <a class="brand" href="#/" :aria-label="t('home')"><span class="brand-mark">85<span>.</span></span> PMD 85 <span class="brand-suffix">/ games</span></a>
+      <span class="header-note">1986 → {{ year }}</span>
+      <div class="global-controls">
+        <label class="sr-only" for="language">{{ t('language') }}</label>
+        <select id="language" v-model="language" :title="t('language')"><option value="cs">Čeština</option><option value="en">English</option></select>
+        <label class="sr-only" for="palette">{{ t('palette') }}</label>
+        <select id="palette" v-model="palette" :title="t('palette')"><option v-for="p in palettes" :value="p">{{ t(p) }}</option></select>
+        <button v-if="page!=='flappy'" class="icon-button" @click="toggleSound" :title="t(sound?'soundOn':'soundOff')+' (Z)'" :aria-label="t(sound?'soundOn':'soundOff')" :aria-pressed="sound" aria-keyshortcuts="Z"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4Z"/><path v-if="sound" d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/><path v-else d="m16 9 6 6m0-6-6 6"/></svg></button>
+      </div>
+    </header>
+    <main v-if="page==='menu'" class="menu-page">
+      <section class="intro"><p class="eyebrow"><span class="status-dot"></span>{{ t('eyebrow') }}</p><h1>{{ t('title') }}<br><span>{{ t('subtitle') }}</span></h1><p class="intro-copy">{{ t('intro') }}</p></section>
+      <section class="collection" aria-labelledby="collection-title">
+        <div class="section-heading"><h2 id="collection-title">{{ t('collection') }}</h2><span>{{ t('count') }}</span></div>
+        <div class="game-list">
+          <a href="#/flappy" class="game-card" data-game="flappy"><div class="card-art flappy-art"><img src="games/flappy/assets/title-screen.png" alt="" loading="eager"><span class="art-label">PMD 85 · 1987</span></div><div class="card-content"><p class="card-number">01 <span>/ {{ t('puzzle') }}</span></p><h3>Flappy<span class="card-dot">.</span></h3><p>{{ t('flappy') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
+          <a href="#/pampuch" class="game-card" data-game="pampuch"><div class="card-art pampuch-art"><canvas ref="preview" width="288" height="256" aria-hidden="true"></canvas><span class="art-label">PMD 85 · 1986</span></div><div class="card-content"><p class="card-number">02 <span>/ {{ t('arcade') }}</span></p><h3>Pampuch<span class="card-dot">.</span></h3><p>{{ t('pampuch') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
+        </div>
+      </section>
+      <p class="menu-note"><span class="status-dot"></span>{{ t('local') }}</p>
+    </main>
+    <main v-else-if="page==='flappy'" class="flappy-page">
+      <nav class="game-toolbar"><a href="#/">← {{ t('back') }}</a><span>01 / FLAPPY</span></nav>
+      <p v-if="isFile" class="storage-note">{{ t('fileNote') }}</p>
+      <iframe v-else ref="flappy" src="games/flappy/index.html?embedded=1" :title="t('flappyFrame')" allow="fullscreen" class="flappy-frame"></iframe>
+      <p class="save-note">{{ t('flappyNote') }}</p>
+    </main>
+    <main v-else-if="page==='pampuch'" class="play-page">
+      <nav class="game-toolbar"><a href="#/">← {{ t('back') }}</a><div class="game-actions">
+        <button @click="requestRestart" :title="t('new')+' (N)'" aria-keyshortcuts="N">↻ <span>{{ t('new') }}</span></button>
+        <button @click="togglePause" :disabled="!['playing','paused'].includes(status) || confirmRestart" :aria-label="t(status==='paused'?'resume':'pause')" :title="t('pause')+' (P)'" aria-keyshortcuts="P">{{ status==='paused'?'▷':'Ⅱ' }}</button>
+        <button @click="expanded=!expanded" :aria-label="t(expanded?'collapse':'expand')" :aria-pressed="expanded" :title="t('expand')+' (F)'" aria-keyshortcuts="F">⛶</button>
+        <button @click="showHelp=!showHelp" :aria-label="t('help')" :aria-expanded="showHelp" :title="t('help')+' (H)'" aria-keyshortcuts="H">?</button>
+      </div></nav>
+      <div class="play-layout">
+        <section class="game-column" aria-labelledby="game-title"><div class="game-heading"><div><p class="eyebrow">02 / {{ t('arcade') }}</p><h1 id="game-title">Pampúch <span>& Duch</span></h1></div><div class="scores"><div><span>{{ t('score') }}</span><strong>{{ score }}</strong></div><div><span>{{ t('best') }}</span><strong>{{ best }}</strong></div></div></div>
+          <div class="machine">
+            <div class="machine-label"><span><i></i> PMD 85-1</span><span>{{ t('original') }}</span></div>
+            <div class="screen"><canvas ref="board" width="288" height="256" tabindex="0" :aria-label="t('board')" :data-state="status" @pointerdown="focusBoard"></canvas>
+              <div v-if="status!=='playing' || confirmRestart" class="board-overlay" role="dialog" aria-modal="true" :aria-label="overlayTitle" @keydown.tab="trapFocus">
+                <span class="overlay-mark" aria-hidden="true">{{ status==='over'?'×':status==='level'?'✓':'85' }}</span><h2>{{ overlayTitle }}</h2><p>{{ overlayText }}</p>
+                <button ref="primary" class="primary-button" @click="primaryAction">{{ primaryText }}</button><button v-if="confirmRestart" class="secondary-button" @click="cancelRestart">{{ t('cancel') }}</button>
+              </div>
+            </div>
+            <div class="machine-bottom"><span>TESLA · PIEŠŤANY</span><span>DUŠAN BLAŠKO / 1986</span></div>
+          </div>
+          <div class="below-board"><span>{{ t('levelLabel') }} <strong>{{ level }}</strong></span><span>{{ t('lives') }} <strong>{{ lives }}</strong></span><span>{{ t('rings') }} <strong>{{ remaining }}</strong></span></div>
+          <div class="direction-pad" role="group" :aria-label="t('controls')"><button v-for="d in touchDirections" :class="d.name" :aria-label="t(d.name)" @pointerdown.prevent="touchMove(d.name,$event)" @contextmenu.prevent>{{ d.symbol }}</button></div>
+          <p class="save-note" :class="{'storage-warning':!storageAvailable}">{{ t(storageAvailable?'saved':'notSaved') }}</p>
+          <p class="sr-only" role="status" aria-live="polite">{{ announcement }}</p>
+        </section>
+        <aside v-if="showHelp" class="game-guide"><p class="eyebrow">PAMPUCH & DUCH</p><h2>{{ t('guideTitle') }}</h2><p>{{ t('guide') }}</p><p>{{ t('guide2') }}</p><div class="controls-help"><h3>{{ t('controls') }}</h3><p>{{ t('controlsText') }}</p></div><p class="tip">{{ t('precise') }}</p></aside>
+      </div>
+    </main>
+    <main v-else class="unknown-page"><h1>{{ t('unknown') }}</h1><a href="#/">{{ t('return') }} →</a></main>
+    <footer><span>PMD85Games · {{ version }}<template v-if="commit"> · {{ commit }}</template></span><a href="https://github.com/pkristofik49/PMD85Games/blob/main/SOURCES.md" target="_blank" rel="noopener">{{ t('sources') }} ↗</a></footer>
+  </div></div>
+  <noscript>Pro hraní povolte JavaScript. / Enable JavaScript to play.</noscript>
+</body>
+</html>
