@@ -104,4 +104,6 @@ The workflow checks both games and packages the static app with
 `node tools/package.mjs`, then publishes `dist/` on pushes to `main`. Set
 **Settings → Pages → Source: GitHub Actions** in the repository and enable
 Actions/Pages. Intended URL: **https://pkristofik49.github.io/PMD85Games/**.
-The application does not change hosting settings automatically.
+The application does not change hosting settings automatically. Until Pages is
+enabled, checks and artifact preparation run successfully and deployment is
+skipped with a notice. After enabling Pages, rerun the workflow to publish.

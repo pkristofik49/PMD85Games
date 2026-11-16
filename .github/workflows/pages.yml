@@ -26,10 +26,17 @@ jobs:
       - run: node --test tests/*.test.mjs
         working-directory: games/flappy
       - run: node tools/package.mjs
+      - name: Check whether Pages is enabled
+        id: pages
+        run: node tools/pages-ready.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/configure-pages@v5
+        if: steps.pages.outputs.enabled == 'true'
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
       - name: Deploy
         id: deployment
+        if: steps.pages.outputs.enabled == 'true'
         uses: actions/deploy-pages@v4

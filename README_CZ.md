@@ -104,4 +104,6 @@ Workflow zkontroluje obě hry, připraví statickou aplikaci příkazem
 `node tools/package.mjs` a po pushi do `main` publikuje `dist/`. V repozitáři
 nastavte **Settings → Pages → Source: GitHub Actions** a povolte Actions/Pages.
 Cílová URL: **https://pkristofik49.github.io/PMD85Games/**.
-Aplikace sama nastavení hostingu nemění.
+Aplikace sama nastavení hostingu nemění. Dokud Pages není zapnuté, kontroly
+a příprava artefaktu proběhnou úspěšně a publikace se přeskočí s upozorněním.
+Po zapnutí Pages spusťte workflow znovu pro publikaci.
