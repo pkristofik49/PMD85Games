@@ -125,8 +125,10 @@ OUT timing and invariance under different frame partitions.
 ### Browser boundary and limits
 
 - The cassette loader/title/map selector is bypassed after monitor startup;
-  the game starts at `0103h`, selecting map 1 through the same operands written
-  by the original menu at `1088h`. Gameplay/monitor instructions are unmodified.
+  the game starts at `0103h`, selecting map 1 (or an unlocked replay map) through
+  the same operands written by the original menu at `1088h`. Gameplay/monitor
+  instructions are unmodified. The browser observes entry at native completion
+  branch `0796h` to persist completed maps; this does not alter CPU state or timing.
 - The browser adds pause, restart confirmation, expanded view, touch keys and
   saved CPU/RAM state. Death and map transitions execute automatically with
   their original delays. Execution stops at `08BDh` after the final native death

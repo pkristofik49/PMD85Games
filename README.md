@@ -37,6 +37,16 @@ Enter continues, N requests a new game, H toggles help, F expands and Z toggles
 sound. New games require confirmation; Escape cancels. Leaving the game,
 losing focus or hiding the page pauses play. Reloading restores a paused game.
 
+Pampuch's **Level** grid button opens the eleven-map selector. Completed maps are
+marked with a check; map 1 and the next map unlocked by each completion are also
+available. Other maps stay locked. Selecting a map starts a fresh attempt with
+five lives and zero score through the original start-menu operands. Opening the
+selector pauses play; closing it or pressing Escape restores the previous state.
+Completion is detected at the native success branch, not from entering a map or
+dying. The completed-map list is saved separately as `pmd85games.pampuch.completed`
+and survives new games, replay, reloads and offline use in the same browser.
+Older native saves infer completed earlier maps from their reached level.
+
 Pampuch now executes the original game and PMD 85-1 monitor on a small custom
 JavaScript 8080 core. Ghost decisions, framebuffer-byte collisions, input polls,
 death delays and level transitions follow the original instructions. Timing uses

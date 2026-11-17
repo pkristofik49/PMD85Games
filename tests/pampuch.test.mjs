@@ -22,3 +22,23 @@ test('Old approximate saves and corrupt native saves are rejected',()=>{
 test('Game over waits for the native death routine, with no browser-imposed death delay',()=>{
  const game=new Pampuch();game.start();game.machine.memory[0xb49]=0;game.machine.memory[0xb4a]=0;game.advance(100);assert.equal(game.state,'playing');for(let i=0;i<100&&game.state==='playing';i++)game.advance(100);assert.equal(game.state,'over');assert.equal(game.lives,0);assert.equal(game.machine.cpu.pc,0x8bd);
 });
+test('Choosing a map uses the original menu operands with a fresh score and lives',()=>{
+ const game=new Pampuch(4);assert.equal(game.map,4);assert.equal(game.level,4);assert.equal(game.score,0);assert.equal(game.lives,5);assert.deepEqual([...game.completedMaps],[]);
+ assert.throws(()=>new Pampuch(12));
+});
+test('Completion is recorded at the native success branch, including the eleventh map',()=>{
+ for(const map of [1,4,8,11]){
+  const game=new Pampuch(map);game.machine.memory[0xc6c]=1;game.machine.memory[0xc6d]=0;game.start();
+  for(let n=0;n<100&&!game.completedMaps.has(map);n++)game.advance(100);
+  assert.deepEqual([...game.completedMaps],[map]);
+  const restored=Pampuch.restore(JSON.parse(JSON.stringify(game.snapshot())));assert.deepEqual([...restored.completedMaps],[map]);
+ }
+});
+test('Dying or merely starting a map does not mark it completed',()=>{
+ const game=new Pampuch(4);game.start();game.machine.memory[0xb49]=0;game.machine.memory[0xb4a]=0;game.advance(4000);assert.equal(game.state,'over');assert.equal(game.completedMaps.size,0);
+});
+test('Existing native saves infer earlier completed maps; selected-map saves do not',()=>{
+ const current=new Pampuch(4),save=current.snapshot();assert.deepEqual([...Pampuch.restore(save).completedMaps],[]);
+ delete save.completedMaps;assert.deepEqual([...Pampuch.restore(save).completedMaps],[1,2,3]);
+ save.completedMaps=[12];assert.equal(Pampuch.restore(save),null);
+});

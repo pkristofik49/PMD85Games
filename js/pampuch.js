@@ -2,7 +2,8 @@
 (() => {
   const SAVE_VERSION=2,STOP_GAME_OVER=0x08bd;
   class Pampuch {
-    constructor(){this.machine=new Pmd85();this.machine.boot();this.state='ready';this.events=[];this.ticks=0;this.startedAt=this.machine.cpu.cycles;}
+    constructor(map=1){this.machine=new Pmd85();this.machine.boot(map);this.state='ready';this.events=[];this.ticks=0;this.startedAt=this.machine.cpu.cycles;this.completedMaps=new Set();}
+    get map(){return this.machine.memory[0x0c7d];}
     get level(){return this.machine.memory[0x0b48];}
     get score(){const m=this.machine.memory;return m[0x0b4b]*10000+m[0x0b4c]*100+m[0x0b4d];}
     get lives(){return this.state==='over'?0:this.machine.memory[0x0c7c];}
@@ -18,11 +19,11 @@
     advance(milliseconds){
       if(this.state!=='playing'||!Number.isFinite(milliseconds)||milliseconds<=0)return;
       const start=this.machine.cpu.cycles,control=this.machine.portC&7;
-      this.machine.advance(milliseconds*Pmd85.CLOCK/1000,{stopAt:STOP_GAME_OVER});this.ticks++;
+      this.machine.advance(milliseconds*Pmd85.CLOCK/1000,{stopAt:STOP_GAME_OVER,onLevelComplete:map=>this.completedMaps.add(map)});this.ticks++;
       this.events.push({start,end:this.machine.cpu.cycles,control,edges:this.machine.edges.splice(0)});
       if(this.machine.cpu.pc===STOP_GAME_OVER){this.state='over';this.release();}
     }
-    snapshot(){return{version:SAVE_VERSION,state:this.state,ticks:this.ticks,startedAt:this.startedAt,machine:this.machine.snapshot()};}
+    snapshot(){return{version:SAVE_VERSION,state:this.state,ticks:this.ticks,startedAt:this.startedAt,completedMaps:[...this.completedMaps],machine:this.machine.snapshot()};}
     static restore(value){
       if(!value||value.version!==SAVE_VERSION||!['ready','playing','paused','over'].includes(value.state))return null;
       const integer=(n,lo,hi)=>Number.isInteger(n)&&n>=lo&&n<=hi;
@@ -35,7 +36,10 @@
         !Number.isFinite(s.targetCycles)||s.targetCycles<0||s.targetCycles>Number.MAX_SAFE_INTEGER||
         (value.state!=='over'&&(s.targetCycles>c.cycles||s.targetCycles<c.cycles-32))||
         !integer(value.ticks,0,Number.MAX_SAFE_INTEGER)||!integer(value.startedAt,0,c.cycles))return null;
+      if(value.completedMaps!==undefined&&(!Array.isArray(value.completedMaps)||value.completedMaps.length>11||!value.completedMaps.every(n=>integer(n,1,11))))return null;
       const game=new Pampuch();game.machine.restore(s);game.ticks=value.ticks;game.startedAt=value.startedAt;
+      // Older native saves always started at map 1 and had no map picker.
+      game.completedMaps=new Set(value.completedMaps??Array.from({length:Math.min(11,Math.max(0,game.level-1))},(_,i)=>i+1));
       game.state=value.state==='playing'?'paused':value.state;return game;
     }
   }

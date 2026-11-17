@@ -56,8 +56,9 @@
     </main>
     <main v-else-if="page==='pampuch'" class="play-page">
       <nav class="game-toolbar"><a href="#/">← {{ t('back') }}</a><div class="game-actions">
-        <button @click="requestRestart" :title="t('new')+' (N)'" aria-keyshortcuts="N">↻ <span>{{ t('new') }}</span></button>
-        <button @click="togglePause" :disabled="!['playing','paused'].includes(status) || confirmRestart" :aria-label="t(status==='paused'?'resume':'pause')" :title="t('pause')+' (P)'" aria-keyshortcuts="P">{{ status==='paused'?'▷':'Ⅱ' }}</button>
+        <button @click="requestRestart" :disabled="levelsOpen" :title="t('new')+' (N)'" aria-keyshortcuts="N">↻ <span>{{ t('new') }}</span></button>
+        <button ref="levelTrigger" class="level-trigger" @click="openLevels" :disabled="confirmRestart" :aria-label="t('chooseLevel')" :aria-expanded="levelsOpen" aria-controls="pampuch-levels" :title="t('chooseLevel')">▦ <span>{{ t('levelLabel') }}</span></button>
+        <button @click="togglePause" :disabled="!['playing','paused'].includes(status) || confirmRestart || levelsOpen" :aria-label="t(status==='paused'?'resume':'pause')" :title="t('pause')+' (P)'" aria-keyshortcuts="P">{{ status==='paused'?'▷':'Ⅱ' }}</button>
         <button @click="expanded=!expanded" :aria-label="t(expanded?'collapse':'expand')" :aria-pressed="expanded" :title="t('expand')+' (F)'" aria-keyshortcuts="F">⛶</button>
         <button @click="showHelp=!showHelp" :aria-label="t('help')" :aria-expanded="showHelp" :title="t('help')+' (H)'" aria-keyshortcuts="H">?</button>
       </div></nav>
@@ -66,7 +67,12 @@
           <div class="machine">
             <div class="machine-label"><span><i></i> PMD 85-1</span><span>{{ t('original') }}</span></div>
             <div class="screen"><canvas ref="board" width="288" height="256" tabindex="0" :aria-label="t('board')" :data-state="status" @pointerdown="focusBoard"></canvas>
-              <div v-if="status!=='playing' || confirmRestart" class="board-overlay" role="dialog" aria-modal="true" :aria-label="overlayTitle" @keydown.tab="trapFocus">
+              <div v-if="levelsOpen" id="pampuch-levels" ref="levelPicker" class="board-overlay level-overlay" role="dialog" aria-modal="true" :aria-label="t('chooseLevel')" @keydown.tab="trapFocus" @keydown="levelKeys">
+                <h2>{{ t('chooseLevel') }}</h2><p>{{ t('completedLevels') }} {{ completedMaps.length }} / 11</p>
+                <div class="level-grid"><button v-for="map in maps" :key="map" :data-map="map" :disabled="!canChooseMap(map)" :class="{completed:completedMaps.includes(map),current:currentMap===map}" :aria-label="t('levelLabel')+' '+map+' — '+t(completedMaps.includes(map)?'levelCompleted':canChooseMap(map)?'levelAvailable':'levelLocked')" :aria-current="currentMap===map?'true':undefined" @click="chooseMap(map)">{{ map }}<small aria-hidden="true">{{ completedMaps.includes(map)?'✓':canChooseMap(map)?'':'🔒' }}</small></button></div>
+                <p class="level-note">{{ t('levelReplayNote') }}</p><button class="secondary-button" @click="closeLevels">{{ t('closeLevels') }}</button>
+              </div>
+              <div v-else-if="status!=='playing' || confirmRestart" class="board-overlay" role="dialog" aria-modal="true" :aria-label="overlayTitle" @keydown.tab="trapFocus">
                 <span class="overlay-mark" aria-hidden="true">{{ status==='over'?'×':status==='level'?'✓':'85' }}</span><h2>{{ overlayTitle }}</h2><p>{{ overlayText }}</p>
                 <button ref="primary" class="primary-button" @click="primaryAction">{{ primaryText }}</button><button v-if="confirmRestart" class="secondary-button" @click="cancelRestart">{{ t('cancel') }}</button>
               </div>

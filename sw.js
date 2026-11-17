@@ -1,4 +1,4 @@
-const RELEASE = '1.003';
+const RELEASE = '1.004';
 const SHELL = [
   "./",
   "assets/pampuch-data.js",

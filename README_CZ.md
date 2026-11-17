@@ -37,6 +37,16 @@ Enter pokračuje, N vyvolá novou hru, H přepíná nápovědu, F zvětšení a 
 Nová hra vyžaduje potvrzení; Escape ho zruší. Odchod ze hry, ztráta zaměření
 nebo skrytí stránky hru pozastaví. Obnovení stránky načte pozastavenou hru.
 
+Tlačítko s mřížkou **Úroveň** otevře výběr jedenácti map Pampucha. Dokončené mapy
+mají fajfku; dostupná je také mapa 1 a další mapa odemčená každým dokončením.
+Ostatní mapy zůstávají zamčené. Výběr spustí nový pokus s pěti životy a nulovým
+skóre přes původní operandy úvodního menu. Otevření výběru hru pozastaví;
+zavření nebo Escape obnoví předchozí stav. Dokončení se zjišťuje v původní větvi
+úspěchu, nikoli při vstupu do mapy nebo smrti. Seznam se ukládá samostatně jako
+`pmd85games.pampuch.completed` a zůstává zachovaný při nové hře, opakování,
+obnovení stránky i offline hraní ve stejném prohlížeči. Ze starších nativních
+uložení se dříve dokončené mapy odvodí podle dosažené úrovně.
+
 Pampuch nyní provádí původní hru i monitor PMD 85-1 na malém vlastním jádře 8080
 v JavaScriptu. Rozhodování duchů, kolize podle bajtů obrazové paměti, čtení kláves,
 prodlevy po smrti i přechody map řídí původní instrukce. Časování používá takt
