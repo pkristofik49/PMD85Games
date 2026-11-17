@@ -1,8 +1,9 @@
-const RELEASE = '1.004';
+const RELEASE = '1.005';
 const SHELL = [
   "./",
   "assets/pampuch-data.js",
   "assets/pampuch-native.js",
+  "assets/pampuch-title.png",
   "commit.json",
   "games/flappy/assets/README.md",
   "games/flappy/assets/game-data.js",

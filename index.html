@@ -25,7 +25,7 @@
   <script defer src="js/pwa.js"></script>
 </head>
 <body>
-  <div id="app" v-cloak><div class="application" :class="{'expanded-mode':expanded && page==='pampuch'}">
+  <div id="app" v-cloak><div class="application" :class="{'expanded-mode':expanded && page==='pampuch','landscape-controls':landscapeControls}" :style="{'--expanded-machine-width':expandedWidth+'px','--global-controls-width':globalControlsWidth+'px'}">
     <header class="site-header">
       <a class="brand" href="#/" :aria-label="t('home')"><span class="brand-mark">85<span>.</span></span> PMD 85 <span class="brand-suffix">/ games</span></a>
       <span class="header-note">1986 → {{ year }}</span>
@@ -43,7 +43,7 @@
         <div class="section-heading"><h2 id="collection-title">{{ t('collection') }}</h2><span>{{ t('count') }}</span></div>
         <div class="game-list">
           <a href="#/flappy" class="game-card" data-game="flappy"><div class="card-art flappy-art"><img src="games/flappy/assets/title-screen.png" alt="" loading="eager"><span class="art-label">PMD 85 · 1987</span></div><div class="card-content"><p class="card-number">01 <span>/ {{ t('puzzle') }}</span></p><h3>Flappy<span class="card-dot">.</span></h3><p>{{ t('flappy') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
-          <a href="#/pampuch" class="game-card" data-game="pampuch"><div class="card-art pampuch-art"><canvas ref="preview" width="288" height="256" aria-hidden="true"></canvas><span class="art-label">PMD 85 · 1986</span></div><div class="card-content"><p class="card-number">02 <span>/ {{ t('arcade') }}</span></p><h3>Pampuch<span class="card-dot">.</span></h3><p>{{ t('pampuch') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
+          <a href="#/pampuch" class="game-card" data-game="pampuch"><div class="card-art pampuch-art"><img src="assets/pampuch-title.png" alt="" loading="eager"><span class="art-label">PMD 85 · 1986</span></div><div class="card-content"><p class="card-number">02 <span>/ {{ t('arcade') }}</span></p><h3>Pampuch<span class="card-dot">.</span></h3><p>{{ t('pampuch') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
         </div>
       </section>
       <p class="menu-note"><span class="status-dot"></span>{{ t('local') }}</p>
@@ -55,7 +55,7 @@
       <p class="save-note">{{ t('flappyNote') }}</p>
     </main>
     <main v-else-if="page==='pampuch'" class="play-page">
-      <nav class="game-toolbar"><a href="#/">← {{ t('back') }}</a><div class="game-actions">
+      <nav class="game-toolbar"><a href="#/" :aria-label="t('back')"><span aria-hidden="true">←</span> <span class="back-label">{{ t('back') }}</span></a><div class="game-actions">
         <button @click="requestRestart" :disabled="levelsOpen" :title="t('new')+' (N)'" aria-keyshortcuts="N">↻ <span>{{ t('new') }}</span></button>
         <button ref="levelTrigger" class="level-trigger" @click="openLevels" :disabled="confirmRestart" :aria-label="t('chooseLevel')" :aria-expanded="levelsOpen" aria-controls="pampuch-levels" :title="t('chooseLevel')">▦ <span>{{ t('levelLabel') }}</span></button>
         <button @click="togglePause" :disabled="!['playing','paused'].includes(status) || confirmRestart || levelsOpen" :aria-label="t(status==='paused'?'resume':'pause')" :title="t('pause')+' (P)'" aria-keyshortcuts="P">{{ status==='paused'?'▷':'Ⅱ' }}</button>

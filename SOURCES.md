@@ -38,6 +38,11 @@ Original: **Dušan Blaško / D. Blasko, PMD 85, 1986**.
   for visual/gameplay comparison. This is the PMD game, not Zoner's 1994 Windows
   release.
 
+`assets/pampuch-title.png` is the unchanged first title-screen screenshot
+(`1.png`, original-resolution `s1600` link) from that review, credited to UgraUgra /
+Herní Archeolog. It depicts the native 1986 "PAMPUCH & DUCH" loader screen and is
+used locally as the collection thumbnail; it is not newly generated artwork.
+
 `games-2.ptp` SHA-256:
 `1b5ca64fca1c7d550c5b146dbc96a0f08a3ba65a78627fed680e687f1c47f38e`.
 
@@ -133,6 +138,14 @@ OUT timing and invariance under different frame partitions.
   saved CPU/RAM state. Death and map transitions execute automatically with
   their original delays. Execution stops at `08BDh` after the final native death
   sound, before native name entry; the browser displays its game-over overlay.
+- Browser presentation stabilizes the player's mouth using the original open /
+  closed glyphs, alternating once per successful half-step observed at `0263h`.
+  The original keyboard scanner repeatedly rewrites both glyphs during one step
+  (`0713h`–`0722h`); sampling those intermediate writes at browser frame rate
+  caused rapid flicker. The display-only glyph replacement does not write to the
+  emulated framebuffer or change CPU timing, game rules or audio. Death entry at
+  `0805h` hides the replacement until the next native spawn/turn. Mouth phase is
+  preserved in compatible native snapshots. Other pixels retain native rendering.
 - This runtime implements the hardware used by this game, not a general-purpose
   PMD emulator with cassette, peripherals or interrupt-driven applications.
   Verification is against independent execution plus documented PMD timing,

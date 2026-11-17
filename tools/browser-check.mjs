@@ -28,6 +28,8 @@ try{
  await until(`document.querySelectorAll('.game-card').length===2 && !document.querySelector('#app').hasAttribute('v-cloak')`);
  await screenshot('menu-desktop.png');
  assert.equal(await evaluate(`document.querySelector('.game-card').dataset.game`),'flappy');
+ await until(`document.querySelector('[data-game="pampuch"] img')?.naturalWidth>0`);
+ assert.match(await evaluate(`document.querySelector('[data-game="pampuch"] img').getAttribute('src')`),/pampuch-title\.png$/);
  // Generate application PNG icons from the tracked vector, rather than borrowing SMG branding.
  for(const [file,size]of [['icon-192.png',192],['icon-512.png',512],['maskable-512.png',512],['apple-touch-icon.png',180]]){
    const data=await evaluate(`(async()=>{const img=new Image();img.src='icons/icon.svg';await img.decode();const c=document.createElement('canvas');c.width=c.height=${size};const x=c.getContext('2d');x.fillStyle='#295244';x.fillRect(0,0,${size},${size});x.drawImage(img,${Math.round(size*.1)},${Math.round(size*.1)},${Math.round(size*.8)},${Math.round(size*.8)});return c.toDataURL('image/png').split(',')[1];})()`);
@@ -66,7 +68,25 @@ try{
  await evaluate(`document.querySelector('canvas[data-state]').focus()`);
  await press('KeyH','h');await press('KeyF','f');
  assert.equal(await evaluate(`document.querySelector('.application').classList.contains('expanded-mode')`),true);
- await screenshot('pampuch-expanded.png');await press('Escape','Escape');
+ await until(`document.querySelector('.screen').getBoundingClientRect().width>1000`);
+ const expandedFit=await evaluate(`(()=>{const machine=document.querySelector('.machine').getBoundingClientRect(),area=document.querySelector('.play-layout').getBoundingClientRect(),screen=document.querySelector('.screen').getBoundingClientRect();return{machineHeight:machine.height,areaHeight:area.height,width:screen.width,height:screen.height,bottom:machine.bottom};})()`);
+ assert.ok(expandedFit.machineHeight<=expandedFit.areaHeight+2);assert.ok(expandedFit.areaHeight-expandedFit.machineHeight<3);
+ assert.ok(Math.abs(expandedFit.width/expandedFit.height-288/256)<.002);assert.ok(expandedFit.bottom<=1080);
+ await screenshot('pampuch-expanded.png');
+ await call('Emulation.setDeviceMetricsOverride',{width:1920,height:1200,deviceScaleFactor:1,mobile:false});
+ await until(`document.querySelector('.screen').getBoundingClientRect().width>1200`);
+ await screenshot('pampuch-expanded-wide.png');
+ await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+ await until(`document.querySelector('.machine').getBoundingClientRect().width<390`);
+ assert.equal(await evaluate(`document.querySelector('.direction-pad').getBoundingClientRect().bottom<=innerHeight`),true);
+ await screenshot('pampuch-expanded-portrait.png');
+ await call('Emulation.setTouchEmulationEnabled',{enabled:true});
+ await call('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:1,mobile:true});
+ await until(`document.querySelector('.application').classList.contains('landscape-controls')`);
+ await until(`document.querySelector('.machine').getBoundingClientRect().bottom<=390`);
+ const landscapeFit=await evaluate(`(()=>{const m=document.querySelector('.machine').getBoundingClientRect(),area=document.querySelector('.play-layout').getBoundingClientRect(),pad=document.querySelector('.direction-pad').getBoundingClientRect();return{height:m.height,available:area.height,overlap:pad.right>m.left&&pad.left<m.right&&pad.bottom>m.top&&pad.top<m.bottom};})()`);
+ assert.ok(landscapeFit.available-landscapeFit.height<3);assert.equal(landscapeFit.overlap,false);
+ await screenshot('pampuch-expanded-landscape.png');await press('Escape','Escape');
  await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
  assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);
  assert.equal(await evaluate(`getComputedStyle(document.querySelector('.direction-pad')).display`),'grid');

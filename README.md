@@ -47,6 +47,13 @@ dying. The completed-map list is saved separately as `pmd85games.pampuch.complet
 and survives new games, replay, reloads and offline use in the same browser.
 Older native saves infer completed earlier maps from their reached level.
 
+The expanded view fits the native aspect ratio to the available viewport with no
+fixed width cap and recalculates on resize/rotation. Touch controls remain below
+the board in portrait and move beside it on short landscape screens. The menu
+thumbnail shows the original Pampuch title screen. For presentation, the mouth
+alternates once per completed movement half-step; intermediate native keyboard
+redraws are hidden without changing game RAM, CPU timing, collisions or sound.
+
 Pampuch now executes the original game and PMD 85-1 monitor on a small custom
 JavaScript 8080 core. Ghost decisions, framebuffer-byte collisions, input polls,
 death delays and level transitions follow the original instructions. Timing uses

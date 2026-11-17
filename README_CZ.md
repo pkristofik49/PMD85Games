@@ -47,6 +47,13 @@ zavření nebo Escape obnoví předchozí stav. Dokončení se zjišťuje v pův
 obnovení stránky i offline hraní ve stejném prohlížeči. Ze starších nativních
 uložení se dříve dokončené mapy odvodí podle dosažené úrovně.
 
+Zvětšené zobrazení přizpůsobí původní poměr stran dostupné ploše bez pevného
+omezení šířky a přepočítá rozměry při změně okna nebo otočení. Dotykové ovládání
+je na výšku pod plochou, na nízkých obrazovkách na šířku vedle ní. Náhled v menu
+ukazuje původní titulní obrazovku Pampucha. Ústa se při zobrazení střídají jednou
+za dokončený půlkrok; mezikroky původního přepisování bitmapy při čtení klávesnice
+se nezobrazují. RAM, časování procesoru, kolize ani zvuk se tím nemění.
+
 Pampuch nyní provádí původní hru i monitor PMD 85-1 na malém vlastním jádře 8080
 v JavaScriptu. Rozhodování duchů, kolize podle bajtů obrazové paměti, čtení kláves,
 prodlevy po smrti i přechody map řídí původní instrukce. Časování používá takt

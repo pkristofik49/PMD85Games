@@ -8,8 +8,28 @@
     const palettes=['green','light','dark','red','blue'];const storedPalette=read('palette','green');
     const palette=ref(palettes.includes(storedPalette)?storedPalette:'green');
     const sound=ref(read('sound','false')==='true'),audio=new PmdAudio();audio.enabled=sound.value;
-    const page=ref('menu'),board=ref(null),preview=ref(null),primary=ref(null),flappy=ref(null);
+    const page=ref('menu'),board=ref(null),primary=ref(null),flappy=ref(null);
     const expanded=ref(false),showHelp=ref(read('help','true')!=='false'),confirmRestart=ref(false);
+    const expandedWidth=ref(800),globalControlsWidth=ref(240),landscapeControls=ref(false);
+    let previousScroll=0,resizeId=0;
+    async function sizeExpanded(){
+      if(!expanded.value||page.value!=='pampuch')return;
+      const id=++resizeId;
+      for(let pass=0;pass<2;pass++){
+        await nextTick();if(id!==resizeId||!expanded.value)return;
+        const layout=document.querySelector('.play-layout'),machine=document.querySelector('.machine'),pad=document.querySelector('.direction-pad');
+        if(!layout||!machine||!board.value)return;
+        const width=window.visualViewport?.width??innerWidth,height=window.visualViewport?.height??innerHeight;
+        const padVisible=pad&&getComputedStyle(pad).display!=='none';
+        landscapeControls.value=!!padVisible&&width>=600&&height<=520&&width>height;
+        globalControlsWidth.value=document.querySelector('.global-controls')?.getBoundingClientRect().width??240;
+        await nextTick();if(id!==resizeId||!expanded.value)return;
+        const area=layout.getBoundingClientRect(),outer=machine.getBoundingClientRect(),screen=board.value.getBoundingClientRect();
+        const padHeight=padVisible&&!landscapeControls.value?pad.getBoundingClientRect().height+parseFloat(getComputedStyle(pad).marginTop):0;
+        const chromeWidth=outer.width-screen.width,chromeHeight=outer.height-screen.height;
+        expandedWidth.value=Math.max(80,Math.min(area.width,Math.max(40,area.height-padHeight-chromeHeight)*288/256+chromeWidth));
+      }
+    }
     const status=ref('ready'),score=ref(0),level=ref(1),lives=ref(5),remaining=ref(0),announcement=ref('');
     const storedBest=Number(read('pampuch.best','0'));const best=ref(Number.isSafeInteger(storedBest)&&storedBest>=0?storedBest:0);
     const version=ArcadeVersion,commit=ref(''),isFile=location.protocol==='file:',year=new Date().getFullYear();
@@ -37,7 +57,6 @@
       if(previousState!==game.state){previousState=game.state;announcement.value=game.state==='playing'?'':t(overlayKey.value);if(game.state!=='playing')void nextTick(()=>primary.value?.focus({preventScroll:true}));}
       paint();
     }
-    function menuPreview(){if(preview.value)PampuchRender.render(preview.value.getContext('2d'),new Pampuch(),best.value);}
     function focusBoard(event){if(game.state==='playing'){event?.preventDefault();board.value?.focus({preventScroll:true});}}
     function primaryAction(){
       audio.unlock();
@@ -59,7 +78,7 @@
       pause();levelsOpen.value=false;confirmRestart.value=false;expanded.value=false;audio.stop();
       // Unmounting Flappy releases its timers, audio, and keyboard handlers.
       const path=location.hash.replace(/^#\/?/,'').replace(/\/$/,'');page.value=path||'menu';
-      void nextTick(()=>{if(page.value==='menu')menuPreview();else if(page.value==='pampuch')sync();});
+      void nextTick(()=>{if(page.value==='pampuch')sync();});
     }
     function flushInputClock(){const now=performance.now();if(page.value==='pampuch'&&!document.hidden&&!confirmRestart.value&&game.state==='playing'){game.advance(Math.min(now-(last||now),250));sync();}last=now;}
     function touchMove(direction,event){audio.unlock();if(game.state!=='playing'||confirmRestart.value)return;flushInputClock();event.currentTarget.setPointerCapture?.(event.pointerId);game.turn(direction);focusBoard();}
@@ -98,13 +117,16 @@
     watch(language,()=>{write('language',language.value);document.documentElement.lang=language.value;document.querySelector('meta[name="description"]').content=t('description');document.title='PMD 85 Games';});
     watch(palette,()=>{write('palette',palette.value);document.documentElement.dataset.palette=palette.value;});
     watch(showHelp,()=>write('help',String(showHelp.value)));
+    watch(expanded,async value=>{resizeId++;document.body.classList.toggle('pampuch-expanded',value);if(value){previousScroll=window.scrollY;await sizeExpanded();}else{landscapeControls.value=false;await nextTick();window.scrollTo(0,previousScroll);}});
+    watch(language,()=>void sizeExpanded());
     onMounted(()=>{
       document.documentElement.lang=language.value;document.documentElement.dataset.palette=palette.value;
       route();frameId=requestAnimationFrame(frame);
       window.addEventListener('hashchange',route);window.addEventListener('keydown',keydown);window.addEventListener('keyup',keyup);window.addEventListener('blur',blur);window.addEventListener('pagehide',save);document.addEventListener('visibilitychange',visibility);
+      window.addEventListener('resize',sizeExpanded);window.visualViewport?.addEventListener('resize',sizeExpanded);
       if(!isFile)fetch('commit.json',{cache:'no-cache'}).then(r=>r.json()).then(m=>{if(m.version===version&&/^[a-f0-9]{7,40}$/.test(m.commit))commit.value=m.commit.slice(0,7);}).catch(()=>{});
     });
-    onUnmounted(()=>{cancelAnimationFrame(frameId);audio.stop();window.removeEventListener('hashchange',route);window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);window.removeEventListener('pagehide',save);document.removeEventListener('visibilitychange',visibility);});
-    return{t,language,palette,palettes,sound,toggleSound,page,board,preview,primary,flappy,expanded,showHelp,confirmRestart,status,score,best,level,lives,remaining,announcement,version,commit,isFile,year,touchDirections,overlayTitle,overlayText,primaryText,primaryAction,togglePause,requestRestart,cancelRestart,focusBoard,touchMove,releaseDirection,trapFocus,storageAvailable,completedMaps,levelsOpen,levelPicker,levelTrigger,currentMap,maps,canChooseMap,openLevels,closeLevels,chooseMap,levelKeys};
+    onUnmounted(()=>{cancelAnimationFrame(frameId);audio.stop();document.body.classList.remove('pampuch-expanded');window.removeEventListener('resize',sizeExpanded);window.visualViewport?.removeEventListener('resize',sizeExpanded);window.removeEventListener('hashchange',route);window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);window.removeEventListener('pagehide',save);document.removeEventListener('visibilitychange',visibility);});
+    return{t,language,palette,palettes,sound,toggleSound,page,board,primary,flappy,expanded,expandedWidth,globalControlsWidth,landscapeControls,showHelp,confirmRestart,status,score,best,level,lives,remaining,announcement,version,commit,isFile,year,touchDirections,overlayTitle,overlayText,primaryText,primaryAction,togglePause,requestRestart,cancelRestart,focusBoard,touchMove,releaseDirection,trapFocus,storageAvailable,completedMaps,levelsOpen,levelPicker,levelTrigger,currentMap,maps,canChooseMap,openLevels,closeLevels,chooseMap,levelKeys};
   }}).mount('#app');
 })();

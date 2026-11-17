@@ -42,3 +42,20 @@ test('Existing native saves infer earlier completed maps; selected-map saves do 
  delete save.completedMaps;assert.deepEqual([...Pampuch.restore(save).completedMaps],[1,2,3]);
  save.completedMaps=[12];assert.equal(Pampuch.restore(save),null);
 });
+test('Mouth poses change once per completed half-step instead of per keyboard redraw',()=>{
+ const game=new Pampuch();game.start();let closed=game.pose.closed,changes=0,address=game.machine.word(0xc6a),steps=0;
+ for(let frame=0;frame<120;frame++){
+  game.advance(1000/60);const next=game.machine.word(0xc6a);if(next!==address)steps++;address=next;
+  if(game.pose.closed!==closed)changes++;closed=game.pose.closed;
+ }
+ assert.equal(steps,11);assert.equal(changes,steps);
+ const saved=Pampuch.restore(JSON.parse(JSON.stringify(game.snapshot())));assert.deepEqual(saved.pose,game.pose);
+});
+test('Blocked movement does not animate the mouth despite repeated native sprite writes',()=>{
+ const game=new Pampuch();game.start();game.turn('down');const address=game.machine.word(0xc6a);
+ for(let n=0;n<120;n++){game.advance(1000/60);assert.equal(game.machine.word(0xc6a),address);assert.equal(game.pose.closed,false);}
+});
+test('Presentation observation does not alter RAM, CPU timing or sound controls',()=>{
+ const game=new Pampuch(),native=new Pmd85();native.boot();game.start();game.advance(2000);native.advance(2000*Pmd85.CLOCK/1000,{stopAt:0x08bd});
+ assert.deepEqual(game.machine.snapshot(),native.snapshot());
+});

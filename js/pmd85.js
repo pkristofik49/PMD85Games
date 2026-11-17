@@ -28,7 +28,7 @@
       this.memory[0x0122]=map;this.memory[0x0109]=map;
       this.cpu.sp=0x7d7c;this.cpu.pc=0x0103;this.until(0x0191);this.edges=[];this.targetCycles=this.cpu.cycles;
     }
-    advance(cycles,{stopAt=null,onLevelComplete=null}={}){this.targetCycles=(this.targetCycles??this.cpu.cycles)+cycles;while(this.cpu.cycles<this.targetCycles&&this.cpu.pc!==stopAt){if(onLevelComplete&&this.cpu.pc===0x0796)onLevelComplete(this.memory[0x0c7d]);this.cpu.step();}}
+    advance(cycles,{stopAt=null,onLevelComplete=null,onPresentation=null}={}){this.targetCycles=(this.targetCycles??this.cpu.cycles)+cycles;while(this.cpu.cycles<this.targetCycles&&this.cpu.pc!==stopAt){if(onLevelComplete&&this.cpu.pc===0x0796)onLevelComplete(this.memory[0x0c7d]);if(onPresentation&&[0x0191,0x0263,0x0805].includes(this.cpu.pc))onPresentation(this.cpu.pc);this.cpu.step();}}
     word(address){return this.memory[address]|this.memory[address+1]<<8;}
     sample(cycle,control=this.portC&7){return !!((control&4)||((control&2)&&(Math.floor(cycle/256)&1))||((control&1)&&(Math.floor(cycle/1024)&1)));}
     snapshot(){return{cpu:this.cpu.snapshot(),ram:[...this.memory.subarray(0,0x8000),...this.memory.subarray(0xc000)],portA:this.portA,portC:this.portC,control:this.control,targetCycles:this.targetCycles};}
