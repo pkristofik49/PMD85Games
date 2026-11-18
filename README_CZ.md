@@ -114,8 +114,10 @@ Volitelné prohlížečové kontroly vyžadují vývojový server a bezhlavý Ch
 s odděleným profilem a `--remote-debugging-port=9333`. Spusťte
 `node tools/browser-check.mjs`. Ověří desktop/mobil, hraní, ukládání,
 překlady, palety, Flappy a obě hry offline. Maže úložiště testovaného místního
-původu, ukládá ignorované snímky do `test-results/` a obnovuje PNG ikony
-ze souboru `icons/icon.svg`.
+původu a ukládá ignorované snímky do `test-results/`.
+Při spuštěném stejném izolovaném Chromu obnoví `node tools/render-icons.mjs`
+PNG ikony ze souboru `icons/icon.svg`. Vybraná pixelová ikona má PMD nad číslem
+85; maskovatelná verze přidává bezpečný okraj pro ořez spouštěčem.
 
 ## Verzování a GitHub Pages
 

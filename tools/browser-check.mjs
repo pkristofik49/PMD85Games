@@ -30,11 +30,6 @@ try{
  assert.equal(await evaluate(`document.querySelector('.game-card').dataset.game`),'flappy');
  await until(`document.querySelector('[data-game="pampuch"] img')?.naturalWidth>0`);
  assert.match(await evaluate(`document.querySelector('[data-game="pampuch"] img').getAttribute('src')`),/pampuch-title\.png$/);
- // Generate application PNG icons from the tracked vector, rather than borrowing SMG branding.
- for(const [file,size]of [['icon-192.png',192],['icon-512.png',512],['maskable-512.png',512],['apple-touch-icon.png',180]]){
-   const data=await evaluate(`(async()=>{const img=new Image();img.src='icons/icon.svg';await img.decode();const c=document.createElement('canvas');c.width=c.height=${size};const x=c.getContext('2d');x.fillStyle='#295244';x.fillRect(0,0,${size},${size});x.drawImage(img,${Math.round(size*.1)},${Math.round(size*.1)},${Math.round(size*.8)},${Math.round(size*.8)});return c.toDataURL('image/png').split(',')[1];})()`);
-   fs.writeFileSync('icons/'+file,Buffer.from(data,'base64'));
- }
  await evaluate(`document.querySelector('[data-game="pampuch"]').click()`);
  await until(`document.querySelector('canvas[data-state="ready"]')`);
  assert.equal(await evaluate('window.__pmdAudioContexts.length'),0,'No audio context before user interaction');

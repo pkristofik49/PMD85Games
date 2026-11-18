@@ -35,3 +35,4 @@ body.pampuch-expanded{overflow:hidden}
 .expanded-mode.landscape-controls .back-label{display:none}
 .expanded-mode.landscape-controls .direction-pad{position:fixed;left:12px;bottom:12px;margin:0;z-index:110}
 .expanded-mode.landscape-controls .game-guide{top:64px;max-height:calc(100dvh - 76px)}
+.brand-mark{display:block;object-fit:contain;background:transparent}

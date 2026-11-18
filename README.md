@@ -114,8 +114,10 @@ Optional browser checks require the development server and Chrome headless with
 an isolated user-data directory and `--remote-debugging-port=9333`. Run
 `node tools/browser-check.mjs`. It tests desktop/mobile, gameplay, saves,
 translations, palettes, Flappy and both games offline. It clears storage on the
-tested local origin, saves ignored screenshots under `test-results/`, and
-regenerates PNG icons from `icons/icon.svg`.
+tested local origin and saves ignored screenshots under `test-results/`.
+With the same isolated Chrome running, `node tools/render-icons.mjs` regenerates
+the PNG icons from `icons/icon.svg`. The approved pixel icon shows PMD above 85;
+the maskable version adds a safe inset for launcher cropping.
 
 ## Versioning and GitHub Pages
 

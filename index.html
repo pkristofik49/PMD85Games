@@ -27,7 +27,7 @@
 <body>
   <div id="app" v-cloak><div class="application" :class="{'expanded-mode':expanded && page==='pampuch','landscape-controls':landscapeControls}" :style="{'--expanded-machine-width':expandedWidth+'px','--global-controls-width':globalControlsWidth+'px'}">
     <header class="site-header">
-      <a class="brand" href="#/" :aria-label="t('home')"><span class="brand-mark">85<span>.</span></span> PMD 85 <span class="brand-suffix">/ games</span></a>
+      <a class="brand" href="#/" :aria-label="t('home')"><img class="brand-mark" src="icons/icon.svg" width="43" height="43" alt=""> PMD 85 <span class="brand-suffix">/ games</span></a>
       <span class="header-note">1986 → {{ year }}</span>
       <div class="global-controls">
         <label class="sr-only" for="language">{{ t('language') }}</label>

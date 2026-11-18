@@ -7,7 +7,10 @@
 native APIs, green collection layout, five palettes, bilingual documentation
 and per-commit versioning. `AGENTS.md`, the version hook and its PowerShell
 helper are adapted from that project. Vue's license remains in
-`vendor/LICENSE.vue`. Application icons are specific to PMD85Games.
+`vendor/LICENSE.vue`. Application icons are specific to PMD85Games. The approved
+pixel design uses two rows (PMD / 85) drawn as SVG rectangles, without a font or
+external image dependency. `tools/render-icons.mjs` creates the PNG derivatives;
+the same SVG is used in the header and as the browser favicon.
 
 ## Flappy
 
