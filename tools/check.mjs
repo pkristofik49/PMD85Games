@@ -9,6 +9,7 @@ assert.equal(fs.readFileSync('sw.js','utf8').match(/const RELEASE = '([^']+)'/)[
 assert.equal(JSON.parse(fs.readFileSync('commit.json','utf8')).version,version);
 for(const directory of ['js','assets'])for(const file of fs.readdirSync(directory).filter(f=>f.endsWith('.js')))execFileSync(process.execPath,['--check',directory+'/'+file]);
 execFileSync(process.execPath,['tools/update-shell.mjs','--check'],{stdio:'inherit'});
+execFileSync(process.execPath,['tools/export-pampuch-sprites.mjs','--check'],{stdio:'inherit'});
 for(const match of fs.readFileSync('index.html','utf8').matchAll(/(?:src|href)="([^"#]+)"/g)){
  const file=match[1];if(file.startsWith('https:')||file.includes('?')||file.startsWith('games/flappy/index'))continue;
  assert.ok(fs.existsSync(file),'Missing resource: '+file);

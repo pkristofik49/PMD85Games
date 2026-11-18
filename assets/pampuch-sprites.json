@@ -1,0 +1,146 @@
+{
+  "meta": {
+    "image": "pampuch-sprites.png",
+    "size": {
+      "w": 64,
+      "h": 64
+    },
+    "format": "RGBA8888",
+    "scale": "1",
+    "cellSize": 16,
+    "padding": 2,
+    "description": "Original PMD 85 Pampuch sprites; 12 x 12 native pixels; transparent background. Blank is the original empty erasing bitmap."
+  },
+  "frames": {
+    "playerLeft": {
+      "frame": {
+        "x": 2,
+        "y": 2,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x0CE0",
+      "label": "LEFT - OPEN"
+    },
+    "playerRight": {
+      "frame": {
+        "x": 18,
+        "y": 2,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x0CF8",
+      "label": "RIGHT - OPEN"
+    },
+    "playerUp": {
+      "frame": {
+        "x": 34,
+        "y": 2,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x0D10",
+      "label": "UP - OPEN"
+    },
+    "playerDown": {
+      "frame": {
+        "x": 50,
+        "y": 2,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x0D28",
+      "label": "DOWN - OPEN"
+    },
+    "playerLeftClosed": {
+      "frame": {
+        "x": 2,
+        "y": 18,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x0D40",
+      "label": "LEFT - CLOSED"
+    },
+    "playerRightClosed": {
+      "frame": {
+        "x": 18,
+        "y": 18,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x0D58",
+      "label": "RIGHT - CLOSED"
+    },
+    "playerUpClosed": {
+      "frame": {
+        "x": 34,
+        "y": 18,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x0D70",
+      "label": "UP - CLOSED"
+    },
+    "playerDownClosed": {
+      "frame": {
+        "x": 50,
+        "y": 18,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x0D88",
+      "label": "DOWN - CLOSED"
+    },
+    "ghost": {
+      "frame": {
+        "x": 2,
+        "y": 34,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x0CC8",
+      "label": "GHOST"
+    },
+    "tomb": {
+      "frame": {
+        "x": 18,
+        "y": 34,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x0C98",
+      "label": "TOMBSTONE"
+    },
+    "wall": {
+      "frame": {
+        "x": 34,
+        "y": 34,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x0FFD",
+      "label": "WALL"
+    },
+    "ring": {
+      "frame": {
+        "x": 50,
+        "y": 34,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x1015",
+      "label": "RING"
+    },
+    "blank": {
+      "frame": {
+        "x": 2,
+        "y": 50,
+        "w": 12,
+        "h": 12
+      },
+      "sourceAddress": "0x0C80",
+      "label": "CLEAR - EMPTY"
+    }
+  }
+}

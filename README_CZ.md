@@ -103,6 +103,15 @@ lze zopakovat příkazem:
 node tools/import-pampuch.mjs cesta/games-2.ptp --check
 ```
 
+Původní grafika spritů je také exportovaná jako
+[průhledný PNG atlas](assets/pampuch-sprites.png),
+[JSON souřadnice spritů](assets/pampuch-sprites.json) a
+[zvětšený náhled s popisky](assets/pampuch-sprites-preview.png).
+Atlas obsahuje všech 13 původních bitmap 12 × 12 (včetně prázdné mazací bitmapy)
+v obrázku 64 × 64, v buňkách po 16 pixelech s okrajem 2 pixely. Obnoví ho
+`node tools/export-pampuch-sprites.mjs`; `tools/check.mjs` kontroluje aktuálnost.
+Jde o podklad k prohlížení/exportu; hra nadále používá nativní data.
+
 Pro obnovení nativního programu/monitoru připojte cestu k `monit1.rom`.
 Běžné testy spouštějí tři nezávislé diagnostiky 8080 a porovnávají 2 400 nativních
 kontrolních bodů vytvořených nezávislou implementací v C. Úplný exerciser CPU je
