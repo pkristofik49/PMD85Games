@@ -4,6 +4,7 @@
 
 Vue sbírka reimplementací her z PMD 85. První karta: **Flappy**.
 Druhá karta: **Pampúch & Duch**. Třetí karta: **Boulder Dash**. Čtvrtá karta: **Auto**.
+Pátá karta: **Žáby / Frogs**.
 Struktura a pravidla vývoje vycházejí ze
 [SMG](https://github.com/pkristofik49/SMG): lokální Vue 3.5.45, statické HTML/CSS/JS,
 nativní API prohlížeče, žádná další běhová knihovna ani instalace npm balíčků.
@@ -19,7 +20,7 @@ node tools/serve.mjs
 
 Otevřete **http://127.0.0.1:4173/PMD85Games/**. Cesty podporují i kořen serveru
 a GitHub Pages pod `/PMD85Games/`. Přímé otevření přes `file://` podporuje menu
-a Pampucha, Boulder Dash i Auto; ES moduly Flappyho a offline podpora vyžadují HTTP/HTTPS.
+a Pampucha, Boulder Dash, Auto i Žáby; ES moduly Flappyho a offline podpora vyžadují HTTP/HTTPS.
 
 ## Hry a ovládání
 
@@ -41,7 +42,7 @@ a Pampucha, Boulder Dash i Auto; ES moduly Flappyho a offline podpora vyžadují
   původní matici E/Y/vlevo/vpravo/Shift bez úprav programu hry. Zkratky
   P/Escape, N, H, F a Z fungují jako u Pampucha. Kompletní CPU, RAM a zvuková
   fáze se ukládají zvlášť do `pmd85games.boulder.v1`; obnovená hra je pozastavená.
-  Všechny čtyři hry fungují offline po instalaci aktualizovaného service workeru.
+  Všechny hry fungují offline po instalaci aktualizovaného service workeru.
 - `#/auto`: **AUTO od R. D.**, původní PMD program z `games-1.ptp`.
   Projeďte pět kol klikaté silnice s co nejmenším počtem havárií. Původní program
   řídí jemné natáčení auta, posun silnice, odrazy po nárazu, zrychlování, počítání
@@ -52,11 +53,24 @@ a Pampucha, Boulder Dash i Auto; ES moduly Flappyho a offline podpora vyžadují
   celého stroje používá `pmd85games.auto.v1`; obnovená hra je pozastavená.
   Karta používá snímek původní jízdy, protože originál nemá titulní menu.
   Nepřibyla žádná další knihovna.
+- `#/zaby`: **ZABY / Žáby**, původní archivovaná verze pro ROM modul MRM.
+  Její původní dekompresor, úvodní obrazovka, plošiny, skoky, zásoba osmi žab,
+  kolize podle pixelů, BCD skóre a PIO zvuk běží na existujícím PMD emulátoru.
+  Nejdřív klávesou R vyšlete novou žábu (původní K9), mezerníkem/↑/W skákejte
+  (původní K4). Do stran žábu unášejí plošiny; samostatně se neřídí. Na mobilu
+  jsou dvě odpovídající tlačítka. P/Escape, Enter, N, H, F a Z fungují jako
+  u Pampucha. Skóre a zásoba žab zůstávají v původní herní ploše. Ukládání
+  používá `pmd85games.zaby.v1` a obnoví pozastavenou hru. Původní zadávání
+  jména do tabulky rekordů nahrazuje webový překryv konce hry a nové hry.
+  Karta ukazuje původní úvodní obrazovku; nepřibyla knihovna. Autor a rok
+  vydání nejsou doloženy.
 
 Podklady lze znovu importovat bez závislostí příkazem
 `node tools/import-boulder.mjs cesta/ke/games-vbg.ptp`; viz [SOURCES.md](SOURCES.md).
 Podklady Auta obdobně vytvoří
 `node tools/import-auto.mjs cesta/ke/games-1.ptp`.
+Podklady Žab vytvoří `node tools/import-zaby.mjs cesta/ke/games-other.mrm`
+ze stejného archivu. Důvod použití funkční MRM verze je v SOURCES.md.
 
 Šipky/WASD mění směr průběžného pohybu. Předčasné zatočení zastaví postavu
 u zdi. Na dotykových zařízeních jsou směrová tlačítka. P/Escape pozastaví,

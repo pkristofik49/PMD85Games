@@ -1,5 +1,44 @@
 # Sources and fidelity
 
+## Žáby / ZABY
+
+The [PMD 85 catalogue](https://pmd85.borik.net/wiki/Package:Games_Other.zip)
+lists ZABY for PMD 85-1/2/2A/3, with unknown author. No publication year is
+claimed. Source: `games-other.mrm` in [the other-games archive](https://pmd85.borik.net/?action=download&did=10).
+The tape edition's loader does not successfully start in the tested core:
+it copies 1000h–1FFFh while that tape record loads at 1500h. The supplied MRM
+edition is complete and starts successfully through its own depacker and menu.
+This is the archived MRM adaptation, not a claim that its menu/loader bytes
+are identical to the problematic tape edition.
+
+`tools/import-zaby.mjs` locates its directory entry using the documented
+[MRM Booter format](https://pmd85.borik.net/wiki/MRM_Booter), then extracts the
+1,836-byte file at sector 04FEh, load/start address 7500h. Runtime executes
+the original depacker, menu and K11 start input on the existing 8080/PMD core.
+It uses the documented MRM entry convention A=1 (PMD 85-1) and SP=8000h.
+No MRM interface is needed after this standalone file has been imported.
+
+- `games-other.mrm` SHA-256: `cb66129768894687da0680fa9c919e78e99541a314a1d6a90ef59feb181b9d33`.
+- ZABY file SHA-256: `bb9572860aa0128e711a93c09920e4d4e2e232f00881c999da00ebeaecf1c0d8`.
+
+Reproduce the asset and original title PNG with
+`node tools/import-zaby.mjs path/to/games-other.mrm`. Original code and art
+remain their authors' work. No game, graphics or emulator library is added.
+
+`js/zaby.js` maps Space/Up/W to native K4 (column 4, bit 0), and R to K9
+(column 9, bit 0). It adds no left/right movement: the original platforms
+carry the frog. The native program owns deployment, eight frogs, jumps,
+collision probes, scoring, deaths and PIO sound. Its wrapped four-digit BCD
+score remains exactly as printed in VRAM (for example 9950 after the initial
+deployment charge). The browser adds pause, restart, translated help, touch
+buttons and full-machine saves. Native high-score name entry is replaced by
+the browser game-over overlay at 7B65h. Native screen text remains unchanged.
+Tests cover boot, deployment, jumps/audio, moving platforms, complete frog
+exhaustion, frame partition independence and save continuity; shared CPU
+diagnostics and independent Pampuch traces remain unchanged. The existing
+hardware model limits still apply; exhaustive physical-hardware equivalence
+is not claimed.
+
 ## Auto
 
 Original: **AUTO, R. D.** The [PMD 85 archive catalogue](https://pmd85.borik.net/wiki/Package:Games_Other.zip)

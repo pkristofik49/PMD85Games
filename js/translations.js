@@ -1,5 +1,19 @@
 globalThis.PmdTranslations = {
   cs: {
+    zabyPausedText:'Plošiny na vás počkají.',
+    zaby:"Přeskákejte se žábou po pohyblivých plošinách až nahoru. Osm žab, přesné načasování a původní pixely.",
+    zabyReady:"Žáby",
+    zabyReadyText:"Klávesou R vyšlete novou žábu. Mezerníkem nebo ↑ načasujte skok na další plošinu.",
+    zabyOverText:"Zásoba žab došla. Zkusíte si skoky znovu?",
+    zabyBoard:"Žáby pro PMD 85. R: nová žába; mezerník nebo šipka nahoru: skok.",
+    zabyHud:"Skóre a zásobu žab ukazuje původní herní obrazovka.",
+    zabyJump:"Skok",
+    zabyNewFrog:"Nová žába",
+    zabyGuideTitle:"Skočte ve správný okamžik.",
+    zabyGuide:"Nejdřív stiskněte R pro novou žábu. Nechte ji unášet pohyblivou plošinou a mezerníkem nebo šipkou nahoru přeskočte na další.",
+    zabyGuide2:"Dostaňte žábu až k hornímu okraji. Minutý skok nebo odnesení mimo plochu stojí žábu. Po ztrátě vyšlete další klávesou R; nová žába také mění skóre podle původních pravidel.",
+    zabyControls:"Mezerník / ↑ / W: skok · R: nová žába · P / Esc: pauza · Enter: pokračování · N: nová hra · H: nápověda · F: zvětšení · Z: zvuk",
+    zabyPrecise:"Původní K4 ovládá skok, K9 novou žábu. Na telefonu použijte tlačítka ↻ a ↑. Žába se pohybuje s plošinami; do stran se samostatně neřídí.",
     autoPausedText:'Silnice na vás počká.',
     auto:"Udržte auto na klikaté silnici. Pět kol původní trati, postupné zrychlování a co nejméně havárií.",
     racing:"ZÁVODNÍ HRA",
@@ -28,7 +42,7 @@ globalThis.PmdTranslations = {
     boulderControls:"Šipky / WASD: směr · Mezerník / Shift: akce · P / Esc: pauza · Enter: pokračování · N: nová hra · H: nápověda · F: zvětšení · Z: zvuk",
     boulderPrecise:"Pohyb i akce odpovídají původním klávesám E, Y, ←, → a Shift. Na telefonu použijte směrový kříž a kulaté tlačítko akce.",
     title:'Hry, které pamatují.',subtitle:'Znovu na vaší obrazovce.',intro:'Malá sbírka velkých vzpomínek. Hry z PMD 85 v prohlížeči.',
-    collection:'Vyberte si hru',count:'04 / SBÍRKA',eyebrow:'ČESKOSLOVENSKÉ OSMIBITOVÉ HRY',
+    collection:'Vyberte si hru',count:'05 / SBÍRKA',eyebrow:'ČESKOSLOVENSKÉ OSMIBITOVÉ HRY',
     flappy:'Dostaňte krystal na své místo. Dvě stě původních místností, kameny, houby a trocha přemýšlení.',
     pampuch:'Posbírejte kroužky a utečte duchům. Původních jedenáct bludišť a každý život se počítá.',
     puzzle:'LOGICKÁ HRA',arcade:'ARKÁDA',play:'Hrát',home:'Sbírka her',back:'Zpět do sbírky',
@@ -51,9 +65,23 @@ globalThis.PmdTranslations = {
     flappyFrame:'Flappy – původních 200 místností',flappyNote:'Flappy má vlastní nastavení jazyka, zvuku a grafiky přímo v herním okně.',
     fileNote:'Flappy používá JavaScriptové moduly. Spusťte aplikaci přes místní HTTP server podle README.',
     sources:'Podklady a věrnost originálu',unknown:'Tato hra tu zatím není.',return:'Zpět na výběr her',
-    description:'Reimplementace her PMD 85: Flappy, Pampúch & Duch, Boulder Dash a Auto. Vue, původní pixely a žádné další herní knihovny.'
+    description:'Reimplementace her PMD 85: Flappy, Pampúch & Duch, Boulder Dash, Auto a Žáby. Vue, původní pixely a žádné další herní knihovny.'
   },
   en: {
+    zabyPausedText:'The platforms can wait.',
+    zaby:"Jump between moving platforms to reach the top. Eight frogs, precise timing and the original pixels.",
+    zabyReady:"Frogs",
+    zabyReadyText:"Press R to deploy a new frog. Use Space or ↑ to time your jump to the next platform.",
+    zabyOverText:"You have run out of frogs. Try those jumps again?",
+    zabyBoard:"Frogs for PMD 85. R: new frog; Space or Up arrow: jump.",
+    zabyHud:"The original screen displays your score and remaining frogs.",
+    zabyJump:"Jump",
+    zabyNewFrog:"New frog",
+    zabyGuideTitle:"Time your next jump.",
+    zabyGuide:"First press R to deploy a frog. Let its moving platform carry it, then press Space or the Up arrow to jump to the next one.",
+    zabyGuide2:"Reach the top edge. Missing a platform or being carried off the screen costs a frog. Press R to deploy another; a new frog also changes the score under the original rules.",
+    zabyControls:"Space / ↑ / W: jump · R: new frog · P / Esc: pause · Enter: continue · N: new game · H: help · F: expand · Z: sound",
+    zabyPrecise:"The original K4 jumps and K9 deploys a new frog. On a phone, use ↻ and ↑. Platforms carry the frog; there is no separate left/right steering.",
     autoPausedText:'The road can wait.',
     auto:"Keep your car on the winding road. Five original laps, increasing speed and as few crashes as possible.",
     racing:"RACING",
@@ -82,7 +110,7 @@ globalThis.PmdTranslations = {
     boulderControls:"Arrows / WASD: direction · Space / Shift: action · P / Esc: pause · Enter: continue · N: new game · H: help · F: expand · Z: sound",
     boulderPrecise:"Movement and action map to the original E, Y, ←, → and Shift keys. On a phone, use the direction pad and round action button.",
     title:'Games that remember.',subtitle:'Back on your screen.',intro:'A small collection of great memories. PMD 85 games in your browser.',
-    collection:'Choose your game',count:'04 / COLLECTION',eyebrow:'CZECHOSLOVAK EIGHT-BIT GAMES',
+    collection:'Choose your game',count:'05 / COLLECTION',eyebrow:'CZECHOSLOVAK EIGHT-BIT GAMES',
     flappy:'Guide the crystal home. Two hundred original rooms, rocks, mushrooms and a little thinking.',
     pampuch:'Collect the rings and escape the ghosts. Eleven original mazes, where every life counts.',
     puzzle:'PUZZLE',arcade:'ARCADE',play:'Play',home:'Game collection',back:'Back to collection',
@@ -104,6 +132,6 @@ globalThis.PmdTranslations = {
     flappyFrame:'Flappy – 200 original rooms',flappyNote:'Flappy has its own language, sound and graphics settings inside the game window.',
     fileNote:'Flappy uses JavaScript modules. Serve the application over HTTP as described in the README.',
     sources:'Sources and fidelity',unknown:'This game is not here yet.',return:'Return to game selection',
-    description:'PMD 85 game reimplementations: Flappy, Pampúch & Duch, Boulder Dash and Auto. Vue, original pixels and no extra game libraries.'
+    description:'PMD 85 game reimplementations: Flappy, Pampúch & Duch, Boulder Dash, Auto and Frogs. Vue, original pixels and no extra game libraries.'
   }
 };

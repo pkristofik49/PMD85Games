@@ -49,3 +49,9 @@ body.pampuch-expanded{overflow:hidden}
 .direction-pad.auto-pad{grid-template-columns:repeat(2,64px);grid-template-rows:48px;gap:18px}
 .direction-pad.auto-pad .left{grid-column:1;grid-row:1}
 .direction-pad.auto-pad .right{grid-column:2;grid-row:1}
+
+/* Frogs needs deployment and jump controls, matching the original K9/K4. */
+.zaby-art img{image-rendering:pixelated;object-fit:contain;background:#000}
+.direction-pad.zaby-pad{grid-template-columns:repeat(2,64px);grid-template-rows:48px;gap:18px}
+.direction-pad.zaby-pad .newFrog{grid-column:1;grid-row:1}
+.direction-pad.zaby-pad .up{grid-column:2;grid-row:1}

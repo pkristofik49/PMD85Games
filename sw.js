@@ -1,4 +1,4 @@
-const RELEASE = '1.009';
+const RELEASE = '1.010';
 const SHELL = [
   "./",
   "assets/auto-native.js",
@@ -11,6 +11,8 @@ const SHELL = [
   "assets/pampuch-sprites.json",
   "assets/pampuch-sprites.png",
   "assets/pampuch-title.png",
+  "assets/zaby-native.js",
+  "assets/zaby-title.png",
   "commit.json",
   "games/flappy/assets/README.md",
   "games/flappy/assets/game-data.js",
@@ -72,6 +74,7 @@ const SHELL = [
   "js/pwa.js",
   "js/translations.js",
   "js/version.js",
+  "js/zaby.js",
   "manifest.webmanifest",
   "styles.css",
   "vendor/LICENSE.pmd-timing",
