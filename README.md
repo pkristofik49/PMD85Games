@@ -3,7 +3,7 @@
 [Česká verze](README_CZ.md)
 
 A Vue collection of PMD 85 game reimplementations. First card: **Flappy**.
-Second card: **Pampúch & Duch**. Structure and development rules follow
+Second card: **Pampúch & Duch**. Third card: **Boulder Dash**. Structure and development rules follow
 [SMG](https://github.com/pkristofik49/SMG): local Vue 3.5.45, static HTML/CSS/JS,
 native browser APIs, no other runtime library or npm installation.
 
@@ -18,7 +18,7 @@ node tools/serve.mjs
 
 Open **http://127.0.0.1:4173/PMD85Games/**. Paths also support a server root and
 GitHub Pages under `/PMD85Games/`. Direct `file://` opening supports the menu and
-Pampuch; Flappy's ES modules and offline support require HTTP/HTTPS.
+Pampuch and Boulder Dash; Flappy's ES modules and offline support require HTTP/HTTPS.
 
 ## Games and controls
 
@@ -30,6 +30,20 @@ Pampuch; Flappy's ES modules and offline support require HTTP/HTTPS.
   four invulnerable ghosts, half-cell movement, one point and four time units
   per ring, blocking tombstones, repeating maps and bonus lives after completing
   maps four and eight of each cycle. Time starts at 500; expiration ends play.
+- `#/boulder`: the original **BOULD+4 (VBG Software, 1988)** PMD program,
+  with 68 sectors connected by its original maze and ten initial lives. Original
+  framebuffer graphics, cave rules, enemies, falling rocks and PIO sound execute
+  on the same 8080/PMD core as Pampuch. Enter sectors through the native maze;
+  there is no separate browser sector picker. The card uses the native title.
+  Hold arrows/WASD to move and Space/Shift for the native action; mobile controls
+  include a round action button. The original E/Y/left/right/Shift matrix is
+  mapped without modifying the game program. P/Escape, N, H, F and Z work as in
+  Pampuch. Saves use the separate `pmd85games.boulder.v1` key with complete CPU,
+  RAM and sound phase; reloading restores paused. All three games work offline
+  after the updated service worker has installed successfully.
+
+Reproduce Boulder assets without dependencies using
+`node tools/import-boulder.mjs path/to/games-vbg.ptp`; see [SOURCES.md](SOURCES.md).
 
 Arrows/WASD change the continuing movement direction. Turning too early stops
 against a wall. Touch devices provide direction buttons. P/Escape pauses,

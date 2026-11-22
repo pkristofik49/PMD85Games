@@ -1,5 +1,41 @@
 # Sources and fidelity
 
+## Boulder Dash / BOULD+4
+
+Original PMD release: **VBG Software (Ladislav Gavar, Vlastimil Veselý,
+Libor Bedrlík), BOULD+4, 1988**. The earlier BOULDER release dates to 1987.
+[The PMD 85 catalogue](https://pmd85.borik.net/wiki/Boulder_Dash) documents
+68 sectors linked by a maze, extra-diamond lives and the compatible BOULD+4
+release. [The VBG tape archive](https://pmd85.borik.net/?action=download&did=8)
+contains `games-vbg.ptp`.
+
+`tools/import-boulder.mjs` reads the BOULD+4 tape records and executes the
+original loader and monitor on the existing 8080 core. The import-only USART
+delivers original tape bytes; runtime play needs no tape interface or network.
+The resulting unmodified lower 32 KiB is in `assets/boulder-native.js`; the
+monitor is reused from `assets/pampuch-native.js`. SHA-256:
+
+- Tape: `1d7884b3da76f610ef2ab5dcedead68ccdde8ca6d0f5eef2a2cd64ab5cfbeec5`.
+- Loaded program: `02950bca05577e0f9a84895c56b18936326334dd80c372ca790fd0f8b4926a05`.
+
+Run `node tools/import-boulder.mjs path/to/games-vbg.ptp` to reproduce the asset
+and native title PNG. No emulator package, game library or image dependency is
+added. Artwork and original program remain the work of their original authors.
+
+`js/boulder.js` boots the original menu, sends a debounced native H and pauses
+before the first maze loop. The browser adds pause, restart confirmation, help,
+touch controls and an independent full-machine save. Arrows/WASD map to native
+E/Y/left/right and Space/Shift drives the active-low SHIFT input. The native
+maze owns sector selection and progression; no caves, object rules, enemies,
+movement delays or effects are reimplemented. Rendering reads original VRAM
+through the existing renderer without Pampuch's optional mouth presentation
+filter. Sound uses original PIO edges with the same hardware-divider synthesis.
+The existing PMD clock/video-arbitration model and hardware limits described
+below apply; this is not a claim of exhaustive hardware or 68-sector playthrough
+verification. Tests cover boot, native movement/audio, cave entry, SHIFT input,
+frame partition independence, full saves and the exhausted-lives branch. Existing
+independent CPU diagnostics and Pampuch C traces remain required and unchanged.
+
 ## Application conventions
 
 [SMG](https://github.com/pkristofik49/SMG), snapshot

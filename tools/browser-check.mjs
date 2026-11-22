@@ -25,7 +25,7 @@ try{
  await call('Storage.clearDataForOrigin',{origin:new URL(base).origin,storageTypes:'all'});
  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
  await call('Page.navigate',{url:base});
- await until(`document.querySelectorAll('.game-card').length===2 && !document.querySelector('#app').hasAttribute('v-cloak')`);
+ await until(`document.querySelectorAll('.game-card').length===3 && !document.querySelector('#app').hasAttribute('v-cloak')`);
  await screenshot('menu-desktop.png');
  assert.equal(await evaluate(`document.querySelector('.game-card').dataset.game`),'flappy');
  await until(`document.querySelector('[data-game="pampuch"] img')?.naturalWidth>0`);
@@ -113,7 +113,7 @@ try{
  await evaluate(`document.querySelector('.level-trigger').click()`);await until(`document.querySelector('#pampuch-levels')`);
  assert.equal(await evaluate(`document.querySelector('[data-map="3"]').disabled`),true);
  await press('Escape','Escape');await until(`!document.querySelector('#pampuch-levels')`);
- await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===2`);
+ await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===3`);
  assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);await screenshot('menu-mobile.png');
  await evaluate(`document.querySelector('[data-game="flappy"]').click()`);
  await until(`document.querySelector('iframe')?.contentDocument.querySelector('.title-screen img')?.naturalWidth>0`);
@@ -124,16 +124,45 @@ try{
  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
  await screenshot('flappy-desktop.png');
  await evaluate(`location.hash='#/'`);await until(`!document.querySelector('iframe')`);
+ const pampuchSave=await evaluate(`localStorage.getItem('pmd85games.pampuch.v2')`);
+ await evaluate(`document.querySelector('[data-game="boulder"]').click()`);
+ await until(`document.querySelector('canvas[data-state="ready"]')`);
+ assert.match(await evaluate(`document.querySelector('#game-title').textContent`),/Boulder/);
+ assert.equal(await evaluate(`!!document.querySelector('.level-trigger')`),false,'Boulder uses the original maze, not Pampuch maps');
+ await evaluate(`document.querySelector('.primary-button').click()`);
+ await call('Input.dispatchKeyEvent',{type:'keyDown',code:'ArrowLeft',key:'ArrowLeft'});await delay(450);
+ await call('Input.dispatchKeyEvent',{type:'keyUp',code:'ArrowLeft',key:'ArrowLeft'});
+ await call('Input.dispatchKeyEvent',{type:'keyDown',code:'Space',key:' '});await delay(80);
+ await call('Input.dispatchKeyEvent',{type:'keyUp',code:'Space',key:' '});
+ await press('KeyP','p');await until(`document.querySelector('canvas[data-state="paused"]')`);
+ const boulderSave=await evaluate(`JSON.parse(localStorage.getItem('pmd85games.boulder.v1'))`);
+ assert.ok(boulderSave.ticks>0);assert.equal(boulderSave.state,'paused');
+ assert.equal(await evaluate(`localStorage.getItem('pmd85games.pampuch.v2')`),pampuchSave,'Game saves are independent');
+ await screenshot('boulder-desktop.png');
+ await call('Page.reload');await until(`document.querySelector('canvas[data-state="paused"]')`);
+ assert.deepEqual(await evaluate(`JSON.parse(localStorage.getItem('pmd85games.boulder.v1')).machine.cpu`),boulderSave.machine.cpu);
+ await press('KeyN','n');await until(`document.querySelector('.secondary-button')`);await press('Escape','Escape');
+ await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+ await until(`getComputedStyle(document.querySelector('.direction-pad')).display==='grid'`);
+ assert.equal(await evaluate(`!!document.querySelector('.direction-pad .action')`),true);
+ assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);
+ await screenshot('boulder-mobile.png');
+ await press('KeyF','f');await call('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:1,mobile:true});
+ await until(`document.querySelector('.application').classList.contains('landscape-controls')`);
+ await delay(150);await screenshot('boulder-landscape.png');
+ assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`),'Touch actions remain beside the expanded board');
+ await press('KeyF','f');
  // The root service worker must cache both games, including the embedded module graph.
  await until(`navigator.serviceWorker.getRegistration().then(r=>!!r?.active)`);
  await call('Page.reload');await until(`navigator.serviceWorker.controller!==null`);
  await call('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
- await call('Page.reload');await until(`document.querySelectorAll('.game-card').length===2`);
+ await evaluate(`location.hash='#/'`);await call('Page.reload');await until(`document.querySelectorAll('.game-card').length===3`);
  await evaluate(`location.hash='#/flappy'`);await until(`document.querySelector('iframe')?.contentDocument.querySelector('.title-screen img')?.naturalWidth>0`);
  await evaluate(`location.hash='#/pampuch'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
+ await evaluate(`location.hash='#/boulder'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  assert.equal(errors.length,0,errors.join('\n'));
  await call('Page.removeScriptToEvaluateOnNewDocument',{identifier:instrumentation.identifier});
- console.log('Browser checks passed: desktop, mobile, gameplay, pause, reload, translations, palettes, Flappy and both games offline.');
+ console.log('Browser checks passed: desktop, mobile, gameplay, pause, reload, translations, palettes, Flappy, Boulder and all three games offline.');
 }finally{
  await call('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});ws.close();
 }

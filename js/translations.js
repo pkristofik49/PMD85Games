@@ -1,7 +1,19 @@
 globalThis.PmdTranslations = {
   cs: {
+    boulder:"Prokopejte cestu za diamanty. Původních 68 sektorů propojených bludištěm, padající kameny a deset životů.",
+    boulderReady:"Boulder Dash",
+    boulderReadyText:"Vydejte se hlavním bludištěm do 68 sektorů. Pozor na padající kameny!",
+    boulderOverText:"Další výprava za diamanty? Nová hra začíná s deseti životy.",
+    boulderBoard:"Boulder Dash pro PMD 85. Šipky nebo WASD: pohyb, mezerník: akce.",
+    boulderHud:"Čas, životy a diamanty ukazuje původní herní obrazovka v sektoru.",
+    boulderAction:"Akce / kopání",
+    boulderGuideTitle:"Diamanty čekají pod zemí.",
+    boulderGuide:"Hlavní bludiště propojuje 68 sektorů. Vstupujte do průchodů, v sektoru seberte požadované diamanty a najděte cestu dál.",
+    boulderGuide2:"Kameny padají a mohou vás rozdrtit. Diamanty nad požadovaný počet přidávají životy. Pravidla, nepřátele i zvuky řídí původní PMD program.",
+    boulderControls:"Šipky / WASD: směr · Mezerník / Shift: akce · P / Esc: pauza · Enter: pokračování · N: nová hra · H: nápověda · F: zvětšení · Z: zvuk",
+    boulderPrecise:"Pohyb i akce odpovídají původním klávesám E, Y, ←, → a Shift. Na telefonu použijte směrový kříž a kulaté tlačítko akce.",
     title:'Hry, které pamatují.',subtitle:'Znovu na vaší obrazovce.',intro:'Malá sbírka velkých vzpomínek. Hry z PMD 85 v prohlížeči.',
-    collection:'Vyberte si hru',count:'02 / SBÍRKA',eyebrow:'ČESKOSLOVENSKÉ OSMIBITOVÉ HRY',
+    collection:'Vyberte si hru',count:'03 / SBÍRKA',eyebrow:'ČESKOSLOVENSKÉ OSMIBITOVÉ HRY',
     flappy:'Dostaňte krystal na své místo. Dvě stě původních místností, kameny, houby a trocha přemýšlení.',
     pampuch:'Posbírejte kroužky a utečte duchům. Původních jedenáct bludišť a každý život se počítá.',
     puzzle:'LOGICKÁ HRA',arcade:'ARKÁDA',play:'Hrát',home:'Sbírka her',back:'Zpět do sbírky',
@@ -24,11 +36,23 @@ globalThis.PmdTranslations = {
     flappyFrame:'Flappy – původních 200 místností',flappyNote:'Flappy má vlastní nastavení jazyka, zvuku a grafiky přímo v herním okně.',
     fileNote:'Flappy používá JavaScriptové moduly. Spusťte aplikaci přes místní HTTP server podle README.',
     sources:'Podklady a věrnost originálu',unknown:'Tato hra tu zatím není.',return:'Zpět na výběr her',
-    description:'Reimplementace her PMD 85: Flappy a Pampúch & Duch. Vue, původní pixely a žádné další herní knihovny.'
+    description:'Reimplementace her PMD 85: Flappy, Pampúch & Duch a Boulder Dash. Vue, původní pixely a žádné další herní knihovny.'
   },
   en: {
+    boulder:"Dig for diamonds. Explore 68 original sectors linked by a maze, with falling rocks and ten lives.",
+    boulderReady:"Boulder Dash",
+    boulderReadyText:"Explore the main maze and its 68 sectors. Watch out for falling rocks!",
+    boulderOverText:"Another diamond expedition? A new game starts with ten lives.",
+    boulderBoard:"Boulder Dash for PMD 85. Arrows or WASD: movement, Space: action.",
+    boulderHud:"The original in-sector screen displays time, lives and diamonds.",
+    boulderAction:"Action / digging",
+    boulderGuideTitle:"Diamonds await underground.",
+    boulderGuide:"The main maze links 68 sectors. Enter the passages, collect the required diamonds in each sector and find your way onwards.",
+    boulderGuide2:"Falling rocks can crush you. Diamonds beyond the required number add lives. The original PMD program controls rules, enemies and sounds.",
+    boulderControls:"Arrows / WASD: direction · Space / Shift: action · P / Esc: pause · Enter: continue · N: new game · H: help · F: expand · Z: sound",
+    boulderPrecise:"Movement and action map to the original E, Y, ←, → and Shift keys. On a phone, use the direction pad and round action button.",
     title:'Games that remember.',subtitle:'Back on your screen.',intro:'A small collection of great memories. PMD 85 games in your browser.',
-    collection:'Choose your game',count:'02 / COLLECTION',eyebrow:'CZECHOSLOVAK EIGHT-BIT GAMES',
+    collection:'Choose your game',count:'03 / COLLECTION',eyebrow:'CZECHOSLOVAK EIGHT-BIT GAMES',
     flappy:'Guide the crystal home. Two hundred original rooms, rocks, mushrooms and a little thinking.',
     pampuch:'Collect the rings and escape the ghosts. Eleven original mazes, where every life counts.',
     puzzle:'PUZZLE',arcade:'ARCADE',play:'Play',home:'Game collection',back:'Back to collection',
@@ -50,6 +74,6 @@ globalThis.PmdTranslations = {
     flappyFrame:'Flappy – 200 original rooms',flappyNote:'Flappy has its own language, sound and graphics settings inside the game window.',
     fileNote:'Flappy uses JavaScript modules. Serve the application over HTTP as described in the README.',
     sources:'Sources and fidelity',unknown:'This game is not here yet.',return:'Return to game selection',
-    description:'PMD 85 game reimplementations: Flappy and Pampúch & Duch. Vue, original pixels and no extra game libraries.'
+    description:'PMD 85 game reimplementations: Flappy, Pampúch & Duch and Boulder Dash. Vue, original pixels and no extra game libraries.'
   }
 };

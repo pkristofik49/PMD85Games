@@ -36,3 +36,10 @@ body.pampuch-expanded{overflow:hidden}
 .expanded-mode.landscape-controls .direction-pad{position:fixed;left:12px;bottom:12px;margin:0;z-index:110}
 .expanded-mode.landscape-controls .game-guide{top:64px;max-height:calc(100dvh - 76px)}
 .brand-mark{display:block;object-fit:contain;background:transparent}
+
+/* Original Boulder title and native action control. */
+.boulder-art img{image-rendering:pixelated;object-fit:contain;background:#000}
+.direction-pad .action{grid-column:4;grid-row:2;border-radius:50%;margin-left:12px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.direction-pad:has(.action){grid-template-columns:repeat(3,52px) 64px}
+.boulder-hud-note{margin:10px 0}
+.expanded-mode.landscape-controls:has(.direction-pad .action) .play-page{padding-left:264px}

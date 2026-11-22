@@ -3,7 +3,7 @@
 [English version](README.md)
 
 Vue sbírka reimplementací her z PMD 85. První karta: **Flappy**.
-Druhá karta: **Pampúch & Duch**. Struktura a pravidla vývoje vycházejí ze
+Druhá karta: **Pampúch & Duch**. Třetí karta: **Boulder Dash**. Struktura a pravidla vývoje vycházejí ze
 [SMG](https://github.com/pkristofik49/SMG): lokální Vue 3.5.45, statické HTML/CSS/JS,
 nativní API prohlížeče, žádná další běhová knihovna ani instalace npm balíčků.
 
@@ -18,7 +18,7 @@ node tools/serve.mjs
 
 Otevřete **http://127.0.0.1:4173/PMD85Games/**. Cesty podporují i kořen serveru
 a GitHub Pages pod `/PMD85Games/`. Přímé otevření přes `file://` podporuje menu
-a Pampucha; ES moduly Flappyho a offline podpora vyžadují HTTP/HTTPS.
+a Pampucha i Boulder Dash; ES moduly Flappyho a offline podpora vyžadují HTTP/HTTPS.
 
 ## Hry a ovládání
 
@@ -30,6 +30,20 @@ a Pampucha; ES moduly Flappyho a offline podpora vyžadují HTTP/HTTPS.
   čtyři nezničitelní duchové, pohyb po půl políčku, bod a čtyři jednotky času
   za kroužek, blokující náhrobky, opakování map a bonusové životy po dokončení
   čtvrté a osmé mapy každého cyklu. Čas začíná na 500; vypršení ukončí hru.
+- `#/boulder`: původní PMD program **BOULD+4 (VBG Software, 1988)**,
+  68 sektorů propojených původním bludištěm a deset počátečních životů. Grafiku
+  z obrazové paměti, pravidla sektorů, nepřátele, padání kamenů i PIO zvuk
+  zpracovává stejný 8080/PMD emulátor jako u Pampucha. Do sektorů se vstupuje
+  v původním bludišti; samostatný webový výběr se nepoužívá. Karta ukazuje
+  původní titulní obrazovku. Držte šipky/WASD pro pohyb a mezerník/Shift pro
+  původní akci. Na mobilu je také kulaté tlačítko akce. Vstup se převádí na
+  původní matici E/Y/vlevo/vpravo/Shift bez úprav programu hry. Zkratky
+  P/Escape, N, H, F a Z fungují jako u Pampucha. Kompletní CPU, RAM a zvuková
+  fáze se ukládají zvlášť do `pmd85games.boulder.v1`; obnovená hra je pozastavená.
+  Všechny tři hry fungují offline po instalaci aktualizovaného service workeru.
+
+Podklady lze znovu importovat bez závislostí příkazem
+`node tools/import-boulder.mjs cesta/ke/games-vbg.ptp`; viz [SOURCES.md](SOURCES.md).
 
 Šipky/WASD mění směr průběžného pohybu. Předčasné zatočení zastaví postavu
 u zdi. Na dotykových zařízeních jsou směrová tlačítka. P/Escape pozastaví,
