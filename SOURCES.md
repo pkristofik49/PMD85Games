@@ -1,5 +1,34 @@
 # Sources and fidelity
 
+## Auto
+
+Original: **AUTO, R. D.** The [PMD 85 archive catalogue](https://pmd85.borik.net/wiki/Package:Games_Other.zip)
+lists AUTO in `games-1.ptp`, entry point `JUMP 2000`, compatible with PMD
+85-1/2/2A/3. Its publication year is not established here. The tape comes from
+[the other-games archive](https://pmd85.borik.net/?action=download&did=10).
+
+`tools/import-auto.mjs` extracts the exact 1,253-byte program at 2000h into
+`assets/auto-native.js`. The existing PMD monitor, 8080 core, VRAM renderer and
+PIO audio are reused; no game or image dependency is introduced. SHA-256:
+
+- `games-1.ptp`: `bc4d5634c13d986a2fed5a224ab96c864b75e8bcd42a6bc6e6d07060c1b3a56d`.
+- AUTO program: `ea21522e9d42ab934550e0e2469c775ba3920db2cd5120e09b90696144fd95d7`.
+
+Reproduce with `node tools/import-auto.mjs path/to/games-1.ptp`. The PNG card
+is original VRAM after twelve seconds of native execution, not recreated art.
+AUTO has no title menu. Original code and artwork remain their authors' work.
+
+`js/auto.js` executes the unmodified program and maps browser left/right to
+native left-EOL (active-low PIO bit 5) and V (column 4, bit 4). Road patterns,
+subpixel steering, automatic forward motion, increasing speed, crash counting,
+bounces, five laps and all sound writes execute on the native core. Browser UI
+adds pause, restart confirmation, translated help, touch steering and separate
+full-machine saves. It stops at 230Fh only after the native finish banner and
+its sound have executed. Tests include a complete unmodified five-lap run,
+steering, collisions, original audio, frame partition independence and saves.
+The existing hardware model and documented limits apply; this is not exhaustive
+physical-hardware timing verification. Original in-game text remains native.
+
 ## Boulder Dash / BOULD+4
 
 Original PMD release: **VBG Software (Ladislav Gavar, Vlastimil Veselý,

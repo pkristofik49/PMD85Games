@@ -25,7 +25,7 @@ try{
  await call('Storage.clearDataForOrigin',{origin:new URL(base).origin,storageTypes:'all'});
  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
  await call('Page.navigate',{url:base});
- await until(`document.querySelectorAll('.game-card').length===3 && !document.querySelector('#app').hasAttribute('v-cloak')`);
+ await until(`document.querySelectorAll('.game-card').length===4 && !document.querySelector('#app').hasAttribute('v-cloak')`);
  await screenshot('menu-desktop.png');
  assert.equal(await evaluate(`document.querySelector('.game-card').dataset.game`),'flappy');
  await until(`document.querySelector('[data-game="pampuch"] img')?.naturalWidth>0`);
@@ -113,7 +113,7 @@ try{
  await evaluate(`document.querySelector('.level-trigger').click()`);await until(`document.querySelector('#pampuch-levels')`);
  assert.equal(await evaluate(`document.querySelector('[data-map="3"]').disabled`),true);
  await press('Escape','Escape');await until(`!document.querySelector('#pampuch-levels')`);
- await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===3`);
+ await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===4`);
  assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);await screenshot('menu-mobile.png');
  await evaluate(`document.querySelector('[data-game="flappy"]').click()`);
  await until(`document.querySelector('iframe')?.contentDocument.querySelector('.title-screen img')?.naturalWidth>0`);
@@ -152,17 +152,41 @@ try{
  await delay(150);await screenshot('boulder-landscape.png');
  assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`),'Touch actions remain beside the expanded board');
  await press('KeyF','f');
- // The root service worker must cache both games, including the embedded module graph.
+ await evaluate(`location.hash='#/auto'`);await until(`document.querySelector('canvas[data-state="ready"]')`);
+ assert.equal(await evaluate(`document.querySelector('#game-title').textContent`),'Auto');
+ assert.equal(await evaluate(`!!document.querySelector('.level-trigger')`),false);
+ await evaluate(`document.querySelector('.primary-button').click()`);
+ await call('Input.dispatchKeyEvent',{type:'keyDown',code:'ArrowLeft',key:'ArrowLeft'});await delay(450);
+ await call('Input.dispatchKeyEvent',{type:'keyUp',code:'ArrowLeft',key:'ArrowLeft'});await press('KeyP','p');
+ await until(`document.querySelector('canvas[data-state="paused"]')`);
+ const autoSave=await evaluate(`JSON.parse(localStorage.getItem('pmd85games.auto.v1'))`);
+ assert.equal(autoSave.state,'paused');assert.ok(autoSave.machine.ram[0x23a3]<24,'Native left steering moves the car');
+ assert.equal(await evaluate(`document.querySelectorAll('.direction-pad button').length`),2);
+ assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);
+ await press('KeyF','f');await until(`document.querySelector('.application').classList.contains('landscape-controls')`);
+ await delay(150);await screenshot('auto-landscape.png');
+ assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
+ await press('KeyF','f');
+ await call('Page.reload');await until(`document.querySelector('canvas[data-state="paused"]')`);
+ assert.deepEqual(await evaluate(`JSON.parse(localStorage.getItem('pmd85games.auto.v1')).machine.cpu`),autoSave.machine.cpu);
+ assert.deepEqual(await evaluate(`JSON.parse(localStorage.getItem('pmd85games.boulder.v1')).machine.cpu`),boulderSave.machine.cpu);
+ await press('KeyN','n');await until(`document.querySelector('.secondary-button')`);await press('Escape','Escape');
+ await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+ await screenshot('auto-mobile.png');
+ await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
+ await screenshot('auto-desktop.png');
+ // The root service worker must cache all four games, including the embedded module graph.
  await until(`navigator.serviceWorker.getRegistration().then(r=>!!r?.active)`);
  await call('Page.reload');await until(`navigator.serviceWorker.controller!==null`);
  await call('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
- await evaluate(`location.hash='#/'`);await call('Page.reload');await until(`document.querySelectorAll('.game-card').length===3`);
+ await evaluate(`location.hash='#/'`);await call('Page.reload');await until(`document.querySelectorAll('.game-card').length===4`);
  await evaluate(`location.hash='#/flappy'`);await until(`document.querySelector('iframe')?.contentDocument.querySelector('.title-screen img')?.naturalWidth>0`);
  await evaluate(`location.hash='#/pampuch'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  await evaluate(`location.hash='#/boulder'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
+ await evaluate(`location.hash='#/auto'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  assert.equal(errors.length,0,errors.join('\n'));
  await call('Page.removeScriptToEvaluateOnNewDocument',{identifier:instrumentation.identifier});
- console.log('Browser checks passed: desktop, mobile, gameplay, pause, reload, translations, palettes, Flappy, Boulder and all three games offline.');
+ console.log('Browser checks passed: desktop, mobile, gameplay, pause, reload, translations, palettes and all four games offline.');
 }finally{
  await call('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});ws.close();
 }

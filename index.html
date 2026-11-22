@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f3ed">
-  <meta name="description" content="Hry z PMD 85 v prohlížeči: Flappy, Pampúch & Duch a Boulder Dash.">
+  <meta name="description" content="Hry z PMD 85 v prohlížeči: Flappy, Pampúch & Duch, Boulder Dash a Auto.">
   <title>PMD 85 Games</title>
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
@@ -14,6 +14,7 @@
   <script defer src="assets/pampuch-data.js"></script>
   <script defer src="assets/pampuch-native.js"></script>
   <script defer src="assets/boulder-native.js"></script>
+  <script defer src="assets/auto-native.js"></script>
   <script defer src="js/translations.js"></script>
   <script defer src="js/version.js"></script>
   <script defer src="js/pixel-font.js"></script>
@@ -21,13 +22,14 @@
   <script defer src="js/pmd85.js"></script>
   <script defer src="js/pampuch.js"></script>
   <script defer src="js/boulder.js"></script>
+  <script defer src="js/auto.js"></script>
   <script defer src="js/pampuch-render.js"></script>
   <script defer src="js/audio.js"></script>
   <script defer src="js/app.js"></script>
   <script defer src="js/pwa.js"></script>
 </head>
 <body>
-  <div id="app" v-cloak><div class="application" :class="{'expanded-mode':expanded && ['pampuch','boulder'].includes(page),'landscape-controls':landscapeControls}" :style="{'--expanded-machine-width':expandedWidth+'px','--global-controls-width':globalControlsWidth+'px'}">
+  <div id="app" v-cloak><div class="application" :class="{'expanded-mode':expanded && ['pampuch','boulder','auto'].includes(page),'landscape-controls':landscapeControls}" :style="{'--expanded-machine-width':expandedWidth+'px','--global-controls-width':globalControlsWidth+'px'}">
     <header class="site-header">
       <a class="brand" href="#/" :aria-label="t('home')"><img class="brand-mark" src="icons/icon.svg" width="43" height="43" alt=""> PMD 85 <span class="brand-suffix">/ games</span></a>
       <span class="header-note">1986 → {{ year }}</span>
@@ -47,6 +49,7 @@
           <a href="#/flappy" class="game-card" data-game="flappy"><div class="card-art flappy-art"><img src="games/flappy/assets/title-screen.png" alt="" loading="eager"><span class="art-label">PMD 85 · 1987</span></div><div class="card-content"><p class="card-number">01 <span>/ {{ t('puzzle') }}</span></p><h3>Flappy<span class="card-dot">.</span></h3><p>{{ t('flappy') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
           <a href="#/pampuch" class="game-card" data-game="pampuch"><div class="card-art pampuch-art"><img src="assets/pampuch-title.png" alt="" loading="eager"><span class="art-label">PMD 85 · 1986</span></div><div class="card-content"><p class="card-number">02 <span>/ {{ t('arcade') }}</span></p><h3>Pampuch<span class="card-dot">.</span></h3><p>{{ t('pampuch') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
           <a href="#/boulder" class="game-card" data-game="boulder"><div class="card-art boulder-art"><img src="assets/boulder-title.png" alt="" loading="eager"><span class="art-label">PMD 85 · 1988</span></div><div class="card-content"><p class="card-number">03 <span>/ {{ t('arcade') }}</span></p><h3>Boulder Dash<span class="card-dot">.</span></h3><p>{{ t('boulder') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
+          <a href="#/auto" class="game-card" data-game="auto"><div class="card-art auto-art"><img src="assets/auto-screen.png" alt="" loading="eager"><span class="art-label">PMD 85 · R. D.</span></div><div class="card-content"><p class="card-number">04 <span>/ {{ t('racing') }}</span></p><h3>Auto<span class="card-dot">.</span></h3><p>{{ t('auto') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
         </div>
       </section>
       <p class="menu-note"><span class="status-dot"></span>{{ t('local') }}</p>
@@ -57,19 +60,19 @@
       <iframe v-else ref="flappy" src="games/flappy/index.html?embedded=1" :title="t('flappyFrame')" allow="fullscreen" class="flappy-frame"></iframe>
       <p class="save-note">{{ t('flappyNote') }}</p>
     </main>
-    <main v-else-if="['pampuch','boulder'].includes(page)" class="play-page">
+    <main v-else-if="['pampuch','boulder','auto'].includes(page)" class="play-page">
       <nav class="game-toolbar"><a href="#/" :aria-label="t('back')"><span aria-hidden="true">←</span> <span class="back-label">{{ t('back') }}</span></a><div class="game-actions">
         <button @click="requestRestart" :disabled="levelsOpen" :title="t('new')+' (N)'" aria-keyshortcuts="N">↻ <span>{{ t('new') }}</span></button>
-        <button v-if="!isBoulder" ref="levelTrigger" class="level-trigger" @click="openLevels" :disabled="confirmRestart" :aria-label="t('chooseLevel')" :aria-expanded="levelsOpen" aria-controls="pampuch-levels" :title="t('chooseLevel')">▦ <span>{{ t('levelLabel') }}</span></button>
+        <button v-if="isPampuch" ref="levelTrigger" class="level-trigger" @click="openLevels" :disabled="confirmRestart" :aria-label="t('chooseLevel')" :aria-expanded="levelsOpen" aria-controls="pampuch-levels" :title="t('chooseLevel')">▦ <span>{{ t('levelLabel') }}</span></button>
         <button @click="togglePause" :disabled="!['playing','paused'].includes(status) || confirmRestart || levelsOpen" :aria-label="t(status==='paused'?'resume':'pause')" :title="t('pause')+' (P)'" aria-keyshortcuts="P">{{ status==='paused'?'▷':'Ⅱ' }}</button>
         <button @click="expanded=!expanded" :aria-label="t(expanded?'collapse':'expand')" :aria-pressed="expanded" :title="t('expand')+' (F)'" aria-keyshortcuts="F">⛶</button>
         <button @click="showHelp=!showHelp" :aria-label="t('help')" :aria-expanded="showHelp" :title="t('help')+' (H)'" aria-keyshortcuts="H">?</button>
       </div></nav>
       <div class="play-layout">
-        <section class="game-column" aria-labelledby="game-title"><div class="game-heading"><div><p class="eyebrow">{{ isBoulder?'03':'02' }} / {{ t('arcade') }}</p><h1 id="game-title"><template v-if="isBoulder">Boulder <span>Dash</span></template><template v-else>Pampúch <span>& Duch</span></template></h1></div><div v-if="!isBoulder" class="scores"><div><span>{{ t('score') }}</span><strong>{{ score }}</strong></div><div><span>{{ t('best') }}</span><strong>{{ best }}</strong></div></div></div>
+        <section class="game-column" aria-labelledby="game-title"><div class="game-heading"><div><p class="eyebrow">{{ isAuto?'04':isBoulder?'03':'02' }} / {{ t(isAuto?'racing':'arcade') }}</p><h1 id="game-title"><template v-if="isAuto">Auto</template><template v-else-if="isBoulder">Boulder <span>Dash</span></template><template v-else>Pampúch <span>& Duch</span></template></h1></div><div v-if="isPampuch" class="scores"><div><span>{{ t('score') }}</span><strong>{{ score }}</strong></div><div><span>{{ t('best') }}</span><strong>{{ best }}</strong></div></div></div>
           <div class="machine">
             <div class="machine-label"><span><i></i> PMD 85-1</span><span>{{ t('original') }}</span></div>
-            <div class="screen"><canvas ref="board" width="288" height="256" tabindex="0" :aria-label="t(isBoulder?'boulderBoard':'board')" :data-state="status" @pointerdown="focusBoard"></canvas>
+            <div class="screen"><canvas ref="board" width="288" height="256" tabindex="0" :aria-label="gameText('Board','board')" :data-state="status" @pointerdown="focusBoard"></canvas>
               <div v-if="levelsOpen" id="pampuch-levels" ref="levelPicker" class="board-overlay level-overlay" role="dialog" aria-modal="true" :aria-label="t('chooseLevel')" @keydown.tab="trapFocus" @keydown="levelKeys">
                 <h2>{{ t('chooseLevel') }}</h2><p>{{ t('completedLevels') }} {{ completedMaps.length }} / 11</p>
                 <div class="level-grid"><button v-for="map in maps" :key="map" :data-map="map" :disabled="!canChooseMap(map)" :class="{completed:completedMaps.includes(map),current:currentMap===map}" :aria-label="t('levelLabel')+' '+map+' — '+t(completedMaps.includes(map)?'levelCompleted':canChooseMap(map)?'levelAvailable':'levelLocked')" :aria-current="currentMap===map?'true':undefined" @click="chooseMap(map)">{{ map }}<small aria-hidden="true">{{ completedMaps.includes(map)?'✓':canChooseMap(map)?'':'🔒' }}</small></button></div>
@@ -80,15 +83,16 @@
                 <button ref="primary" class="primary-button" @click="primaryAction">{{ primaryText }}</button><button v-if="confirmRestart" class="secondary-button" @click="cancelRestart">{{ t('cancel') }}</button>
               </div>
             </div>
-            <div class="machine-bottom"><span>TESLA · PIEŠŤANY</span><span>{{ isBoulder?'VBG SOFTWARE / 1988':'DUŠAN BLAŠKO / 1986' }}</span></div>
+            <div class="machine-bottom"><span>TESLA · PIEŠŤANY</span><span>{{ isAuto?'AUTO / R. D.':isBoulder?'VBG SOFTWARE / 1988':'DUŠAN BLAŠKO / 1986' }}</span></div>
           </div>
-          <div v-if="!isBoulder" class="below-board"><span>{{ t('levelLabel') }} <strong>{{ level }}</strong></span><span>{{ t('lives') }} <strong>{{ lives }}</strong></span><span>{{ t('rings') }} <strong>{{ remaining }}</strong></span></div>
+          <div v-if="isPampuch" class="below-board"><span>{{ t('levelLabel') }} <strong>{{ level }}</strong></span><span>{{ t('lives') }} <strong>{{ lives }}</strong></span><span>{{ t('rings') }} <strong>{{ remaining }}</strong></span></div>
+          <div v-if="isAuto" class="below-board"><span>{{ t('autoCrashes') }} <strong>{{ score }}</strong></span><span>{{ t('autoLaps') }} <strong>{{ remaining }}</strong></span></div>
           <p v-if="isBoulder" class="save-note boulder-hud-note">{{ t('boulderHud') }}</p>
-          <div class="direction-pad" role="group" :aria-label="t('controls')"><button v-for="d in touchDirections" :class="d.name" :aria-label="t(d.name)" @pointerdown.prevent="touchMove(d.name,$event)" @pointerup="releaseDirection(d.name)" @pointercancel="releaseDirection(d.name)" @lostpointercapture="releaseDirection(d.name)" @contextmenu.prevent>{{ d.symbol }}</button><button v-if="isBoulder" class="action" :aria-label="t('boulderAction')" @pointerdown.prevent="touchMove('action',$event)" @pointerup="releaseDirection('action')" @pointercancel="releaseDirection('action')" @lostpointercapture="releaseDirection('action')" @contextmenu.prevent>●</button></div>
+          <div class="direction-pad" :class="{'auto-pad':isAuto}" role="group" :aria-label="t('controls')"><button v-for="d in (isAuto?touchDirections.filter(d=>['left','right'].includes(d.name)):touchDirections)" :class="d.name" :aria-label="t(d.name)" @pointerdown.prevent="touchMove(d.name,$event)" @pointerup="releaseDirection(d.name)" @pointercancel="releaseDirection(d.name)" @lostpointercapture="releaseDirection(d.name)" @contextmenu.prevent>{{ d.symbol }}</button><button v-if="isBoulder" class="action" :aria-label="t('boulderAction')" @pointerdown.prevent="touchMove('action',$event)" @pointerup="releaseDirection('action')" @pointercancel="releaseDirection('action')" @lostpointercapture="releaseDirection('action')" @contextmenu.prevent>●</button></div>
           <p class="save-note" :class="{'storage-warning':!storageAvailable}">{{ t(storageAvailable?'saved':'notSaved') }}</p>
           <p class="sr-only" role="status" aria-live="polite">{{ announcement }}</p>
         </section>
-        <aside v-if="showHelp" class="game-guide"><p class="eyebrow">{{ isBoulder?'BOULDER DASH / BOULD+4':'PAMPUCH & DUCH' }}</p><h2>{{ t(isBoulder?'boulderGuideTitle':'guideTitle') }}</h2><p>{{ t(isBoulder?'boulderGuide':'guide') }}</p><p>{{ t(isBoulder?'boulderGuide2':'guide2') }}</p><div class="controls-help"><h3>{{ t('controls') }}</h3><p>{{ t(isBoulder?'boulderControls':'controlsText') }}</p></div><p class="tip">{{ t(isBoulder?'boulderPrecise':'precise') }}</p></aside>
+        <aside v-if="showHelp" class="game-guide"><p class="eyebrow">{{ isAuto?'AUTO / R. D.':isBoulder?'BOULDER DASH / BOULD+4':'PAMPUCH & DUCH' }}</p><h2>{{ gameText('GuideTitle','guideTitle') }}</h2><p>{{ gameText('Guide','guide') }}</p><p>{{ gameText('Guide2','guide2') }}</p><div class="controls-help"><h3>{{ t('controls') }}</h3><p>{{ gameText('Controls','controlsText') }}</p></div><p class="tip">{{ gameText('Precise','precise') }}</p></aside>
       </div>
     </main>
     <main v-else class="unknown-page"><h1>{{ t('unknown') }}</h1><a href="#/">{{ t('return') }} →</a></main>

@@ -34,28 +34,33 @@
     const storedBest=Number(read('pampuch.best','0'));const best=ref(Number.isSafeInteger(storedBest)&&storedBest>=0?storedBest:0);
     const version=ArcadeVersion,commit=ref(''),isFile=location.protocol==='file:',year=new Date().getFullYear();
     let game;try{game=Pampuch.restore(JSON.parse(read('pampuch.v2','null')));}catch{}game??=new Pampuch();
-    let pampuchGame=game,boulderGame=null;
+    const sessions={pampuch:game},gameTypes={pampuch:Pampuch,boulder:Boulder,auto:AutoGame};let gameId='pampuch';
     const isBoulder=computed(()=>page.value==='boulder');
-    const isNativePage=()=>['pampuch','boulder'].includes(page.value);
+    const isAuto=computed(()=>page.value==='auto'),isPampuch=computed(()=>page.value==='pampuch');
+    const isNativePage=()=>Object.hasOwn(gameTypes,page.value);
     let savedCompleted;try{savedCompleted=JSON.parse(read('pampuch.completed','[]'));}catch{}
     const completedMaps=ref(Array.isArray(savedCompleted)?[...new Set(savedCompleted.filter(n=>Number.isInteger(n)&&n>=1&&n<=11))].sort((a,b)=>a-b):[]);
     const levelsOpen=ref(false),levelPicker=ref(null),levelTrigger=ref(null),currentMap=ref(game.map);
     const maps=Array.from({length:11},(_,i)=>i+1);let stateBeforeLevels='ready';
     const canChooseMap=map=>map===1||completedMaps.value.includes(map)||completedMaps.value.includes(map-1);
-    function rememberCompleted(){if(game instanceof Boulder)return;const merged=[...new Set([...completedMaps.value,...game.completedMaps])].sort((a,b)=>a-b);if(merged.length!==completedMaps.value.length){completedMaps.value=merged;write('pampuch.completed',JSON.stringify(merged));}}
+    function rememberCompleted(){if(!(game instanceof Pampuch))return;const merged=[...new Set([...completedMaps.value,...game.completedMaps])].sort((a,b)=>a-b);if(merged.length!==completedMaps.value.length){completedMaps.value=merged;write('pampuch.completed',JSON.stringify(merged));}}
     rememberCompleted();
     let frameId,last=0,previousState='',stateBeforeConfirm='ready',lastSavedAt=0;
     const t=key=>PmdTranslations[language.value][key]??key;
     const overlayKey=computed(()=>confirmRestart.value?'confirm':({ready:'ready',paused:'paused',dead:'dead',over:'over',level:'level'}[status.value]??'ready'));
-    const overlayTitle=computed(()=>t(isBoulder.value&&status.value==='ready'&&!confirmRestart.value?'boulderReady':overlayKey.value));const overlayText=computed(()=>t(isBoulder.value&&!confirmRestart.value&&['ready','over'].includes(status.value)?'boulder'+(status.value==='ready'?'Ready':'Over')+'Text':overlayKey.value+'Text'));
+    const gameText=(suffix,fallback)=>t(isPampuch.value?fallback:page.value+suffix);
+    const overlayTitle=computed(()=>!confirmRestart.value&&status.value==='ready'?gameText('Ready','ready'):isAuto.value&&!confirmRestart.value&&status.value==='over'?t('autoFinished'):t(overlayKey.value));
+    const overlayText=computed(()=>(isAuto.value&&!confirmRestart.value&&status.value==='paused'?t('autoPausedText'):!isPampuch.value&&!confirmRestart.value&&['ready','over'].includes(status.value)?gameText((status.value==='ready'?'Ready':'Over')+'Text',''):t(overlayKey.value+'Text')).replace('{crashes}',String(score.value)));
     const primaryText=computed(()=>t(confirmRestart.value?'new':status.value==='ready'?'start':status.value==='over'?'new':status.value==='level'?'next':'resume'));
     const touchDirections=[{name:'up',symbol:'↑'},{name:'left',symbol:'←'},{name:'down',symbol:'↓'},{name:'right',symbol:'→'}];
-    function save(){write(game instanceof Boulder?'boulder.v1':'pampuch.v2',JSON.stringify(game.snapshot()));}
+    const saveKey=id=>id==='pampuch'?'pampuch.v2':id+'.v1';
+    function save(){write(saveKey(gameId),JSON.stringify(game.snapshot()));}
     function paint(){if(board.value)PampuchRender.render(board.value.getContext('2d'),game,best.value);}
     function sync(){
       status.value=game.state;lives.value=game.lives;
-      if(!isBoulder.value){score.value=game.score;level.value=game.level;remaining.value=game.remaining;currentMap.value=game.map;rememberCompleted();}
-      if(!isBoulder.value&&score.value>best.value){best.value=score.value;write('pampuch.best',String(best.value));}
+      if(isPampuch.value){score.value=game.score;level.value=game.level;remaining.value=game.remaining;currentMap.value=game.map;rememberCompleted();}
+      if(isAuto.value){score.value=game.crashes;remaining.value=game.lapsRemaining;}
+      if(isPampuch.value&&score.value>best.value){best.value=score.value;write('pampuch.best',String(best.value));}
       for(const event of game.takeEvents())audio.play(event);
       if(previousState!==game.state){previousState=game.state;announcement.value=game.state==='playing'?'':t(overlayKey.value);if(game.state!=='playing')void nextTick(()=>primary.value?.focus({preventScroll:true}));}
       paint();
@@ -63,7 +68,7 @@
     function focusBoard(event){if(game.state==='playing'){event?.preventDefault();board.value?.focus({preventScroll:true});}}
     function primaryAction(){
       audio.unlock();
-      if(confirmRestart.value||game.state==='over'){game=isBoulder.value?new Boulder():new Pampuch();game.start();confirmRestart.value=false;}
+      if(confirmRestart.value||game.state==='over'){game=new gameTypes[gameId]();game.start();confirmRestart.value=false;}
       else if(game.state==='paused')game.state='playing';
       else if(game.state==='ready')game.start();else game.continue();
       last=performance.now();game.release();sync();save();void nextTick(()=>board.value?.focus({preventScroll:true}));
@@ -71,7 +76,7 @@
     function pause(){game.release();if(game.state==='playing'){game.state='paused';audio.stop();sync();save();}}
     function togglePause(){if(confirmRestart.value||levelsOpen.value)return;if(game.state==='playing')pause();else if(game.state==='paused')primaryAction();}
     function requestRestart(){if(confirmRestart.value||levelsOpen.value)return;stateBeforeConfirm=game.state;pause();confirmRestart.value=true;audio.stop();void nextTick(()=>primary.value?.focus());}
-    function openLevels(){if(isBoulder.value||confirmRestart.value||levelsOpen.value)return;flushInputClock();stateBeforeLevels=game.state;pause();levelsOpen.value=true;audio.stop();void nextTick(()=>{const panel=levelPicker.value;(panel?.querySelector(`[data-map="${currentMap.value}"]:not(:disabled)`)??panel?.querySelector('[data-map]:not(:disabled)'))?.focus();});}
+    function openLevels(){if(!isPampuch.value||confirmRestart.value||levelsOpen.value)return;flushInputClock();stateBeforeLevels=game.state;pause();levelsOpen.value=true;audio.stop();void nextTick(()=>{const panel=levelPicker.value;(panel?.querySelector(`[data-map="${currentMap.value}"]:not(:disabled)`)??panel?.querySelector('[data-map]:not(:disabled)'))?.focus();});}
     function closeLevels(){levelsOpen.value=false;game.state=stateBeforeLevels;last=performance.now();sync();save();void nextTick(()=>{if(game.state==='playing')board.value?.focus({preventScroll:true});else levelTrigger.value?.focus({preventScroll:true});});}
     function chooseMap(map){if(!Number.isInteger(map)||map<1||map>11||!canChooseMap(map))return;rememberCompleted();audio.unlock();audio.stop();game=new Pampuch(map);levelsOpen.value=false;game.start();last=performance.now();sync();save();void nextTick(()=>board.value?.focus({preventScroll:true}));}
     function levelKeys(event){if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(event.key))return;const buttons=[...levelPicker.value.querySelectorAll('[data-map]:not(:disabled)')];if(!buttons.length)return;event.preventDefault();const index=buttons.indexOf(document.activeElement),step=['ArrowLeft','ArrowUp'].includes(event.key)?-1:1;let next=(index+step+buttons.length)%buttons.length;if(event.key==='Home')next=0;if(event.key==='End')next=buttons.length-1;buttons[next].focus();}
@@ -79,10 +84,10 @@
     function toggleSound(){sound.value=!sound.value;audio.enabled=sound.value;write('sound',String(sound.value));if(sound.value)audio.unlock();else audio.stop();}
     function route(){
       pause();levelsOpen.value=false;confirmRestart.value=false;expanded.value=false;audio.stop();
-      if(game instanceof Boulder)boulderGame=game;else pampuchGame=game;
+      sessions[gameId]=game;
       // Unmounting Flappy releases its timers, audio, and keyboard handlers.
       const path=location.hash.replace(/^#\/?/,'').replace(/\/$/,'');page.value=path||'menu';
-      if(isBoulder.value){if(!boulderGame){try{boulderGame=Boulder.restore(JSON.parse(read('boulder.v1','null')));}catch{}boulderGame??=new Boulder();}game=boulderGame;}else game=pampuchGame;
+      if(isNativePage()){gameId=page.value;if(!sessions[gameId]){try{sessions[gameId]=gameTypes[gameId].restore(JSON.parse(read(saveKey(gameId),'null')));}catch{}sessions[gameId]??=new gameTypes[gameId]();}game=sessions[gameId];}
       previousState='';last=performance.now();
       void nextTick(()=>{if(isNativePage())sync();});
     }
@@ -134,6 +139,6 @@
       if(!isFile)fetch('commit.json',{cache:'no-cache'}).then(r=>r.json()).then(m=>{if(m.version===version&&/^[a-f0-9]{7,40}$/.test(m.commit))commit.value=m.commit.slice(0,7);}).catch(()=>{});
     });
     onUnmounted(()=>{cancelAnimationFrame(frameId);audio.stop();document.body.classList.remove('pampuch-expanded');window.removeEventListener('resize',sizeExpanded);window.visualViewport?.removeEventListener('resize',sizeExpanded);window.removeEventListener('hashchange',route);window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);window.removeEventListener('pagehide',save);document.removeEventListener('visibilitychange',visibility);});
-    return{t,language,palette,palettes,sound,toggleSound,page,isBoulder,board,primary,flappy,expanded,expandedWidth,globalControlsWidth,landscapeControls,showHelp,confirmRestart,status,score,best,level,lives,remaining,announcement,version,commit,isFile,year,touchDirections,overlayTitle,overlayText,primaryText,primaryAction,togglePause,requestRestart,cancelRestart,focusBoard,touchMove,releaseDirection,trapFocus,storageAvailable,completedMaps,levelsOpen,levelPicker,levelTrigger,currentMap,maps,canChooseMap,openLevels,closeLevels,chooseMap,levelKeys};
+    return{t,gameText,language,palette,palettes,sound,toggleSound,page,isBoulder,isAuto,isPampuch,board,primary,flappy,expanded,expandedWidth,globalControlsWidth,landscapeControls,showHelp,confirmRestart,status,score,best,level,lives,remaining,announcement,version,commit,isFile,year,touchDirections,overlayTitle,overlayText,primaryText,primaryAction,togglePause,requestRestart,cancelRestart,focusBoard,touchMove,releaseDirection,trapFocus,storageAvailable,completedMaps,levelsOpen,levelPicker,levelTrigger,currentMap,maps,canChooseMap,openLevels,closeLevels,chooseMap,levelKeys};
   }}).mount('#app');
 })();

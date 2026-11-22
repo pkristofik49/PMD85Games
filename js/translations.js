@@ -1,5 +1,20 @@
 globalThis.PmdTranslations = {
   cs: {
+    autoPausedText:'Silnice na vás počká.',
+    auto:"Udržte auto na klikaté silnici. Pět kol původní trati, postupné zrychlování a co nejméně havárií.",
+    racing:"ZÁVODNÍ HRA",
+    autoReady:"Auto",
+    autoReadyText:"Pět kol na klikaté silnici. Dojeďte s co nejmenším počtem havárií.",
+    autoFinished:"Cíl!",
+    autoOverText:"Dojeli jste do cíle. Počet havárií: {crashes}. Zkusíte další jízdu?",
+    autoCrashes:"Havárie",
+    autoLaps:"Zbývá kol",
+    autoBoard:"Auto pro PMD 85. Šipky vlevo/vpravo nebo A/D: řízení.",
+    autoGuideTitle:"Udržte se na silnici.",
+    autoGuide:"Řiďte vlevo a vpravo mezi okraji silnice. Auto jede samo a původní program postupně zvyšuje rychlost.",
+    autoGuide2:"Náraz do krajnice přidá havárii a auto odrazí zpět. Hra pokračuje až do cíle po pěti kolech. Cílem je dojet s co nejmenším počtem havárií.",
+    autoControls:"← / → nebo A / D: řízení · P / Esc: pauza · Enter: pokračování · N: nová jízda · H: nápověda · F: zvětšení · Z: zvuk",
+    autoPrecise:"Držte směr pro plynulé řízení. Na telefonu použijte dvě směrová tlačítka. Trať, havárie, rychlost i zvuk běží z původního PMD programu.",
     boulder:"Prokopejte cestu za diamanty. Původních 68 sektorů propojených bludištěm, padající kameny a deset životů.",
     boulderReady:"Boulder Dash",
     boulderReadyText:"Vydejte se hlavním bludištěm do 68 sektorů. Pozor na padající kameny!",
@@ -13,7 +28,7 @@ globalThis.PmdTranslations = {
     boulderControls:"Šipky / WASD: směr · Mezerník / Shift: akce · P / Esc: pauza · Enter: pokračování · N: nová hra · H: nápověda · F: zvětšení · Z: zvuk",
     boulderPrecise:"Pohyb i akce odpovídají původním klávesám E, Y, ←, → a Shift. Na telefonu použijte směrový kříž a kulaté tlačítko akce.",
     title:'Hry, které pamatují.',subtitle:'Znovu na vaší obrazovce.',intro:'Malá sbírka velkých vzpomínek. Hry z PMD 85 v prohlížeči.',
-    collection:'Vyberte si hru',count:'03 / SBÍRKA',eyebrow:'ČESKOSLOVENSKÉ OSMIBITOVÉ HRY',
+    collection:'Vyberte si hru',count:'04 / SBÍRKA',eyebrow:'ČESKOSLOVENSKÉ OSMIBITOVÉ HRY',
     flappy:'Dostaňte krystal na své místo. Dvě stě původních místností, kameny, houby a trocha přemýšlení.',
     pampuch:'Posbírejte kroužky a utečte duchům. Původních jedenáct bludišť a každý život se počítá.',
     puzzle:'LOGICKÁ HRA',arcade:'ARKÁDA',play:'Hrát',home:'Sbírka her',back:'Zpět do sbírky',
@@ -36,9 +51,24 @@ globalThis.PmdTranslations = {
     flappyFrame:'Flappy – původních 200 místností',flappyNote:'Flappy má vlastní nastavení jazyka, zvuku a grafiky přímo v herním okně.',
     fileNote:'Flappy používá JavaScriptové moduly. Spusťte aplikaci přes místní HTTP server podle README.',
     sources:'Podklady a věrnost originálu',unknown:'Tato hra tu zatím není.',return:'Zpět na výběr her',
-    description:'Reimplementace her PMD 85: Flappy, Pampúch & Duch a Boulder Dash. Vue, původní pixely a žádné další herní knihovny.'
+    description:'Reimplementace her PMD 85: Flappy, Pampúch & Duch, Boulder Dash a Auto. Vue, původní pixely a žádné další herní knihovny.'
   },
   en: {
+    autoPausedText:'The road can wait.',
+    auto:"Keep your car on the winding road. Five original laps, increasing speed and as few crashes as possible.",
+    racing:"RACING",
+    autoReady:"Auto",
+    autoReadyText:"Five laps on a winding road. Reach the finish with as few crashes as possible.",
+    autoFinished:"Finish!",
+    autoOverText:"You reached the finish. Crashes: {crashes}. Try another drive?",
+    autoCrashes:"Crashes",
+    autoLaps:"Laps remaining",
+    autoBoard:"Auto for PMD 85. Left/right arrows or A/D: steering.",
+    autoGuideTitle:"Stay on the road.",
+    autoGuide:"Steer left and right between the road edges. The car drives automatically and the original program gradually increases its speed.",
+    autoGuide2:"Hitting the roadside adds a crash and bounces the car back. Play continues until the finish after five laps. Aim for the fewest crashes.",
+    autoControls:"← / → or A / D: steer · P / Esc: pause · Enter: continue · N: new drive · H: help · F: expand · Z: sound",
+    autoPrecise:"Hold a direction to steer continuously. On a phone, use the two direction buttons. The original PMD program controls the road, crashes, speed and sound.",
     boulder:"Dig for diamonds. Explore 68 original sectors linked by a maze, with falling rocks and ten lives.",
     boulderReady:"Boulder Dash",
     boulderReadyText:"Explore the main maze and its 68 sectors. Watch out for falling rocks!",
@@ -52,7 +82,7 @@ globalThis.PmdTranslations = {
     boulderControls:"Arrows / WASD: direction · Space / Shift: action · P / Esc: pause · Enter: continue · N: new game · H: help · F: expand · Z: sound",
     boulderPrecise:"Movement and action map to the original E, Y, ←, → and Shift keys. On a phone, use the direction pad and round action button.",
     title:'Games that remember.',subtitle:'Back on your screen.',intro:'A small collection of great memories. PMD 85 games in your browser.',
-    collection:'Choose your game',count:'03 / COLLECTION',eyebrow:'CZECHOSLOVAK EIGHT-BIT GAMES',
+    collection:'Choose your game',count:'04 / COLLECTION',eyebrow:'CZECHOSLOVAK EIGHT-BIT GAMES',
     flappy:'Guide the crystal home. Two hundred original rooms, rocks, mushrooms and a little thinking.',
     pampuch:'Collect the rings and escape the ghosts. Eleven original mazes, where every life counts.',
     puzzle:'PUZZLE',arcade:'ARCADE',play:'Play',home:'Game collection',back:'Back to collection',
@@ -74,6 +104,6 @@ globalThis.PmdTranslations = {
     flappyFrame:'Flappy – 200 original rooms',flappyNote:'Flappy has its own language, sound and graphics settings inside the game window.',
     fileNote:'Flappy uses JavaScript modules. Serve the application over HTTP as described in the README.',
     sources:'Sources and fidelity',unknown:'This game is not here yet.',return:'Return to game selection',
-    description:'PMD 85 game reimplementations: Flappy, Pampúch & Duch and Boulder Dash. Vue, original pixels and no extra game libraries.'
+    description:'PMD 85 game reimplementations: Flappy, Pampúch & Duch, Boulder Dash and Auto. Vue, original pixels and no extra game libraries.'
   }
 };

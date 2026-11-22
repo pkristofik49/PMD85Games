@@ -1,6 +1,8 @@
-const RELEASE = '1.008';
+const RELEASE = '1.009';
 const SHELL = [
   "./",
+  "assets/auto-native.js",
+  "assets/auto-screen.png",
   "assets/boulder-native.js",
   "assets/boulder-title.png",
   "assets/pampuch-data.js",
@@ -60,6 +62,7 @@ const SHELL = [
   "index.html",
   "js/app.js",
   "js/audio.js",
+  "js/auto.js",
   "js/boulder.js",
   "js/i8080.js",
   "js/pampuch-render.js",

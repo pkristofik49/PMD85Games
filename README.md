@@ -3,7 +3,8 @@
 [Česká verze](README_CZ.md)
 
 A Vue collection of PMD 85 game reimplementations. First card: **Flappy**.
-Second card: **Pampúch & Duch**. Third card: **Boulder Dash**. Structure and development rules follow
+Second card: **Pampúch & Duch**. Third card: **Boulder Dash**. Fourth card: **Auto**.
+Structure and development rules follow
 [SMG](https://github.com/pkristofik49/SMG): local Vue 3.5.45, static HTML/CSS/JS,
 native browser APIs, no other runtime library or npm installation.
 
@@ -18,7 +19,7 @@ node tools/serve.mjs
 
 Open **http://127.0.0.1:4173/PMD85Games/**. Paths also support a server root and
 GitHub Pages under `/PMD85Games/`. Direct `file://` opening supports the menu and
-Pampuch and Boulder Dash; Flappy's ES modules and offline support require HTTP/HTTPS.
+Pampuch, Boulder Dash and Auto; Flappy's ES modules and offline support require HTTP/HTTPS.
 
 ## Games and controls
 
@@ -39,11 +40,22 @@ Pampuch and Boulder Dash; Flappy's ES modules and offline support require HTTP/H
   include a round action button. The original E/Y/left/right/Shift matrix is
   mapped without modifying the game program. P/Escape, N, H, F and Z work as in
   Pampuch. Saves use the separate `pmd85games.boulder.v1` key with complete CPU,
-  RAM and sound phase; reloading restores paused. All three games work offline
+  RAM and sound phase; reloading restores paused. All four games work offline
   after the updated service worker has installed successfully.
+- `#/auto`: **AUTO by R. D.**, the original PMD program from `games-1.ptp`.
+  Drive five laps along the original winding road with as few crashes as possible.
+  The original program controls subpixel steering, road scrolling, collision
+  bounce, speed increases, crash count, finish screen and sound. Use left/right
+  arrows or A/D; phones have two steering buttons. These map to the native
+  left-EOL and V inputs. P/Escape, Enter, N, H, F and Z work as in Pampuch.
+  Native crashes and laps are also shown below the board. A separate full-machine
+  save uses `pmd85games.auto.v1`; reloading pauses play. The card uses a native
+  driving screenshot because the original has no title menu. No library was added.
 
 Reproduce Boulder assets without dependencies using
 `node tools/import-boulder.mjs path/to/games-vbg.ptp`; see [SOURCES.md](SOURCES.md).
+Auto assets can likewise be reproduced with
+`node tools/import-auto.mjs path/to/games-1.ptp`.
 
 Arrows/WASD change the continuing movement direction. Turning too early stops
 against a wall. Touch devices provide direction buttons. P/Escape pauses,

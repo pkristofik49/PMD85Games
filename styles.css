@@ -43,3 +43,9 @@ body.pampuch-expanded{overflow:hidden}
 .direction-pad:has(.action){grid-template-columns:repeat(3,52px) 64px}
 .boulder-hud-note{margin:10px 0}
 .expanded-mode.landscape-controls:has(.direction-pad .action) .play-page{padding-left:264px}
+
+/* Auto has two steering controls and retains the native display aspect. */
+.auto-art img{image-rendering:pixelated;object-fit:contain;background:#000}
+.direction-pad.auto-pad{grid-template-columns:repeat(2,64px);grid-template-rows:48px;gap:18px}
+.direction-pad.auto-pad .left{grid-column:1;grid-row:1}
+.direction-pad.auto-pad .right{grid-column:2;grid-row:1}
