@@ -1,5 +1,49 @@
 # Sources and fidelity
 
+## Manic Miner / MANIC+
+
+Original PMD conversion: **Vít Libovický and Daniel Jenne, MANIC+, 1985**,
+for PMD 85-1, based on Matthew Smith's original. The
+[PMD 85 catalogue](https://pmd85.borik.net/wiki/Manic_Miner_original) documents
+twenty caverns, collecting all flashing items to open the exit, oxygen and
+the converted title tune. Source: `MANIC+` in `games-2.ptp` from
+[the other-games archive](https://pmd85.borik.net/?action=download&did=10).
+This uses the PMD 85-1 release, not MANIC+2 or a later remake.
+
+`tools/import-manic.mjs` feeds the original UART tape bytes to the original
+7EDFh loader running on the existing PMD core, including its block checksums.
+It captures lower RAM at its RST 0 entry after all 27,437 payload bytes have
+been consumed. Runtime needs no tape interface or network. The 32 KiB image
+in `assets/manic-native.js` preserves the original program and data; the
+existing monitor is reused. SHA-256:
+
+- `games-2.ptp`: `1b5ca64fca1c7d550c5b146dbc96a0f08a3ba65a78627fed680e687f1c47f38e`.
+- Loaded program: `b8d383c0d3d2ad02e4e75ce8db7cdb55ecc2e653645954ff2c6a773b429f05d4`.
+
+Run `node tools/import-manic.mjs path/to/games-2.ptp` to reproduce the native
+asset and title PNG. Original program and artwork remain their authors' work.
+No game, audio, image or emulator library is introduced.
+
+`js/manic.js` runs the native title renderer and tune. Unlike other ready
+screens, its ready state executes the intro on the visible, focused page;
+it stops at 7C66h before the automatic demo. Browser Start uses the native
+STOP matrix input to select human mode and enter the original first cavern.
+Left/right map to columns 12/14, bit 2; browser jump maps to the native
+active-low left-SHIFT bit 5. The browser adds no movement, collision, oxygen,
+enemy, platform or item rules. Title/game music and effects use original PIO
+edges and the shared divider/PCM synthesis. The browser adds pause, touch
+controls, restart confirmation and full-machine saves. Original game HUD
+and Czech screen text are preserved. Native high-score name entry is replaced
+by the game-over overlay at 7DA4h, after the final native death routine.
+
+Tests cover the native tune, human start, movement/jump/audio, frame partition
+independence, full saves and all eight oxygen deaths. A completion-branch
+fixture loads all twenty distinct caverns and verifies the native victory
+screen and faster next cycle; this does not claim a manual full playthrough.
+Shared CPU diagnostics and independent Pampuch traces remain required. The
+documented hardware model limits still apply; exhaustive hardware-equivalent
+timing has not been established.
+
 ## Žáby / ZABY
 
 The [PMD 85 catalogue](https://pmd85.borik.net/wiki/Package:Games_Other.zip)

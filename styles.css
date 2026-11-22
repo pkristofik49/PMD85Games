@@ -55,3 +55,10 @@ body.pampuch-expanded{overflow:hidden}
 .direction-pad.zaby-pad{grid-template-columns:repeat(2,64px);grid-template-rows:48px;gap:18px}
 .direction-pad.zaby-pad .newFrog{grid-column:1;grid-row:1}
 .direction-pad.zaby-pad .up{grid-column:2;grid-row:1}
+
+/* Native Manic Miner uses left/right and a separate jump control. */
+.manic-art img{image-rendering:pixelated;object-fit:contain;background:#000}
+.direction-pad.manic-pad{grid-template-columns:repeat(3,64px);grid-template-rows:48px;gap:18px}
+.direction-pad.manic-pad .left{grid-column:1;grid-row:1}
+.direction-pad.manic-pad .right{grid-column:2;grid-row:1}
+.direction-pad.manic-pad .action{grid-column:3;grid-row:1;margin-left:0}

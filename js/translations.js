@@ -1,5 +1,19 @@
 globalThis.PmdTranslations = {
   cs: {
+    manic:"Proveďte Willyho dvaceti původními šachtami. Sbírejte předměty, přeskakujte nástrahy a hlídejte kyslík.",
+    platformer:"PLOŠINOVÁ HRA",
+    manicReady:"Manic Miner",
+    manicReadyText:"Dvacet šachet a osm životů. Při zapnutém zvuku hraje původní úvodní melodie; začátkem hry ji přeskočíte.",
+    manicOverText:"Willymu došly životy. Zkusíte šachty znovu?",
+    manicPausedText:"Šachta na vás počká.",
+    manicBoard:"Manic Miner pro PMD 85. Šipky vlevo/vpravo nebo A/D: pohyb; mezerník nebo Shift: skok.",
+    manicHud:"Kyslík, předměty, životy i skóre ukazuje původní herní plocha.",
+    manicAction:"Skok",
+    manicGuideTitle:"Z dolu vede dvacet šachet.",
+    manicGuide:"Posbírejte všechny blikající předměty a projděte otevřeným východem. Willy umí chodit do stran a skákat; pozor na nepřátele, nástrahy a nebezpečné pády.",
+    manicGuide2:"Kyslík postupně ubývá. Původní program řídí pohyblivé plošiny, dopravníky, propadající se podlahy, nepřátele i přechody do dalších šachet.",
+    manicControls:"← / → nebo A / D: pohyb · Mezerník / Shift / ↑ / W: skok · P / Esc: pauza · Enter: pokračování · N: nová hra · H: nápověda · F: zvětšení · Z: zvuk",
+    manicPrecise:"Na mobilu použijte dvě šipky a kulaté tlačítko skoku. Úvodní i herní hudba a efekty vznikají z původního PMD programu.",
     zabyPausedText:'Plošiny na vás počkají.',
     zaby:"Přeskákejte se žábou po pohyblivých plošinách až nahoru. Osm žab, přesné načasování a původní pixely.",
     zabyReady:"Žáby",
@@ -42,7 +56,7 @@ globalThis.PmdTranslations = {
     boulderControls:"Šipky / WASD: směr · Mezerník / Shift: akce · P / Esc: pauza · Enter: pokračování · N: nová hra · H: nápověda · F: zvětšení · Z: zvuk",
     boulderPrecise:"Pohyb i akce odpovídají původním klávesám E, Y, ←, → a Shift. Na telefonu použijte směrový kříž a kulaté tlačítko akce.",
     title:'Hry, které pamatují.',subtitle:'Znovu na vaší obrazovce.',intro:'Malá sbírka velkých vzpomínek. Hry z PMD 85 v prohlížeči.',
-    collection:'Vyberte si hru',count:'05 / SBÍRKA',eyebrow:'ČESKOSLOVENSKÉ OSMIBITOVÉ HRY',
+    collection:'Vyberte si hru',count:'06 / SBÍRKA',eyebrow:'ČESKOSLOVENSKÉ OSMIBITOVÉ HRY',
     flappy:'Dostaňte krystal na své místo. Dvě stě původních místností, kameny, houby a trocha přemýšlení.',
     pampuch:'Posbírejte kroužky a utečte duchům. Původních jedenáct bludišť a každý život se počítá.',
     puzzle:'LOGICKÁ HRA',arcade:'ARKÁDA',play:'Hrát',home:'Sbírka her',back:'Zpět do sbírky',
@@ -65,9 +79,23 @@ globalThis.PmdTranslations = {
     flappyFrame:'Flappy – původních 200 místností',flappyNote:'Flappy má vlastní nastavení jazyka, zvuku a grafiky přímo v herním okně.',
     fileNote:'Flappy používá JavaScriptové moduly. Spusťte aplikaci přes místní HTTP server podle README.',
     sources:'Podklady a věrnost originálu',unknown:'Tato hra tu zatím není.',return:'Zpět na výběr her',
-    description:'Reimplementace her PMD 85: Flappy, Pampúch & Duch, Boulder Dash, Auto a Žáby. Vue, původní pixely a žádné další herní knihovny.'
+    description:'Reimplementace her PMD 85: Flappy, Pampúch & Duch, Boulder Dash, Auto, Žáby a Manic Miner. Vue, původní pixely a žádné další herní knihovny.'
   },
   en: {
+    manic:"Guide Willy through twenty original caverns. Collect the items, jump over hazards and watch your oxygen.",
+    platformer:"PLATFORMER",
+    manicReady:"Manic Miner",
+    manicReadyText:"Twenty caverns and eight lives. With sound enabled, the original title tune plays; starting the game skips it.",
+    manicOverText:"Willy has run out of lives. Try the caverns again?",
+    manicPausedText:"The cavern can wait.",
+    manicBoard:"Manic Miner for PMD 85. Left/right or A/D: move; Space or Shift: jump.",
+    manicHud:"The original screen displays oxygen, items, lives and score.",
+    manicAction:"Jump",
+    manicGuideTitle:"Twenty caverns to escape.",
+    manicGuide:"Collect every flashing item and pass through the open exit. Willy can walk sideways and jump; avoid enemies, hazards and dangerous falls.",
+    manicGuide2:"Oxygen gradually runs out. The original program controls moving platforms, conveyors, crumbling floors, enemies and cavern transitions.",
+    manicControls:"← / → or A / D: move · Space / Shift / ↑ / W: jump · P / Esc: pause · Enter: continue · N: new game · H: help · F: expand · Z: sound",
+    manicPrecise:"On a phone, use the two arrows and round jump button. The original PMD program produces the title tune, in-game music and effects.",
     zabyPausedText:'The platforms can wait.',
     zaby:"Jump between moving platforms to reach the top. Eight frogs, precise timing and the original pixels.",
     zabyReady:"Frogs",
@@ -110,7 +138,7 @@ globalThis.PmdTranslations = {
     boulderControls:"Arrows / WASD: direction · Space / Shift: action · P / Esc: pause · Enter: continue · N: new game · H: help · F: expand · Z: sound",
     boulderPrecise:"Movement and action map to the original E, Y, ←, → and Shift keys. On a phone, use the direction pad and round action button.",
     title:'Games that remember.',subtitle:'Back on your screen.',intro:'A small collection of great memories. PMD 85 games in your browser.',
-    collection:'Choose your game',count:'05 / COLLECTION',eyebrow:'CZECHOSLOVAK EIGHT-BIT GAMES',
+    collection:'Choose your game',count:'06 / COLLECTION',eyebrow:'CZECHOSLOVAK EIGHT-BIT GAMES',
     flappy:'Guide the crystal home. Two hundred original rooms, rocks, mushrooms and a little thinking.',
     pampuch:'Collect the rings and escape the ghosts. Eleven original mazes, where every life counts.',
     puzzle:'PUZZLE',arcade:'ARCADE',play:'Play',home:'Game collection',back:'Back to collection',
@@ -132,6 +160,6 @@ globalThis.PmdTranslations = {
     flappyFrame:'Flappy – 200 original rooms',flappyNote:'Flappy has its own language, sound and graphics settings inside the game window.',
     fileNote:'Flappy uses JavaScript modules. Serve the application over HTTP as described in the README.',
     sources:'Sources and fidelity',unknown:'This game is not here yet.',return:'Return to game selection',
-    description:'PMD 85 game reimplementations: Flappy, Pampúch & Duch, Boulder Dash, Auto and Frogs. Vue, original pixels and no extra game libraries.'
+    description:'PMD 85 game reimplementations: Flappy, Pampúch & Duch, Boulder Dash, Auto, Frogs and Manic Miner. Vue, original pixels and no extra game libraries.'
   }
 };

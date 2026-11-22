@@ -34,10 +34,11 @@
     const storedBest=Number(read('pampuch.best','0'));const best=ref(Number.isSafeInteger(storedBest)&&storedBest>=0?storedBest:0);
     const version=ArcadeVersion,commit=ref(''),isFile=location.protocol==='file:',year=new Date().getFullYear();
     let game;try{game=Pampuch.restore(JSON.parse(read('pampuch.v2','null')));}catch{}game??=new Pampuch();
-    const sessions={pampuch:game},gameTypes={pampuch:Pampuch,boulder:Boulder,auto:AutoGame,zaby:ZabyGame};let gameId='pampuch';
+    const sessions={pampuch:game},gameTypes={pampuch:Pampuch,boulder:Boulder,auto:AutoGame,zaby:ZabyGame,manic:ManicGame};let gameId='pampuch';
     const isBoulder=computed(()=>page.value==='boulder');
     const isAuto=computed(()=>page.value==='auto'),isPampuch=computed(()=>page.value==='pampuch');
     const isZaby=computed(()=>page.value==='zaby');
+    const isManic=computed(()=>page.value==='manic');
     const isNativePage=()=>Object.hasOwn(gameTypes,page.value);
     let savedCompleted;try{savedCompleted=JSON.parse(read('pampuch.completed','[]'));}catch{}
     const completedMaps=ref(Array.isArray(savedCompleted)?[...new Set(savedCompleted.filter(n=>Number.isInteger(n)&&n>=1&&n<=11))].sort((a,b)=>a-b):[]);
@@ -51,9 +52,9 @@
     const overlayKey=computed(()=>confirmRestart.value?'confirm':({ready:'ready',paused:'paused',dead:'dead',over:'over',level:'level'}[status.value]??'ready'));
     const gameText=(suffix,fallback)=>t(isPampuch.value?fallback:page.value+suffix);
     const overlayTitle=computed(()=>!confirmRestart.value&&status.value==='ready'?gameText('Ready','ready'):isAuto.value&&!confirmRestart.value&&status.value==='over'?t('autoFinished'):t(overlayKey.value));
-    const overlayText=computed(()=>((isAuto.value||isZaby.value)&&!confirmRestart.value&&status.value==='paused'?gameText('PausedText',''):!isPampuch.value&&!confirmRestart.value&&['ready','over'].includes(status.value)?gameText((status.value==='ready'?'Ready':'Over')+'Text',''):t(overlayKey.value+'Text')).replace('{crashes}',String(score.value)));
+    const overlayText=computed(()=>((isAuto.value||isZaby.value||isManic.value)&&!confirmRestart.value&&status.value==='paused'?gameText('PausedText',''):!isPampuch.value&&!confirmRestart.value&&['ready','over'].includes(status.value)?gameText((status.value==='ready'?'Ready':'Over')+'Text',''):t(overlayKey.value+'Text')).replace('{crashes}',String(score.value)));
     const primaryText=computed(()=>t(confirmRestart.value?'new':status.value==='ready'?'start':status.value==='over'?'new':status.value==='level'?'next':'resume'));
-    const touchDirections=computed(()=>isZaby.value?[{name:'newFrog',symbol:'↻'},{name:'up',symbol:'↑'}]:[{name:'up',symbol:'↑'},{name:'left',symbol:'←'},{name:'down',symbol:'↓'},{name:'right',symbol:'→'}].filter(d=>!isAuto.value||['left','right'].includes(d.name)));
+    const touchDirections=computed(()=>isZaby.value?[{name:'newFrog',symbol:'↻'},{name:'up',symbol:'↑'}]:[{name:'up',symbol:'↑'},{name:'left',symbol:'←'},{name:'down',symbol:'↓'},{name:'right',symbol:'→'}].filter(d=>!(isAuto.value||isManic.value)||['left','right'].includes(d.name)));
     const saveKey=id=>id==='pampuch'?'pampuch.v2':id+'.v1';
     function save(){write(saveKey(gameId),JSON.stringify(game.snapshot()));}
     function paint(){if(board.value)PampuchRender.render(board.value.getContext('2d'),game,best.value);}
@@ -71,7 +72,7 @@
       audio.unlock();
       if(confirmRestart.value||game.state==='over'){game=new gameTypes[gameId]();game.start();confirmRestart.value=false;}
       else if(game.state==='paused')game.state='playing';
-      else if(game.state==='ready')game.start();else game.continue();
+      else if(game.state==='ready'){audio.stop();game.start();}else game.continue();
       last=performance.now();game.release();sync();save();void nextTick(()=>board.value?.focus({preventScroll:true}));
     }
     function pause(){game.release();if(game.state==='playing'){game.state='paused';audio.stop();sync();save();}}
@@ -83,6 +84,7 @@
     function levelKeys(event){if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(event.key))return;const buttons=[...levelPicker.value.querySelectorAll('[data-map]:not(:disabled)')];if(!buttons.length)return;event.preventDefault();const index=buttons.indexOf(document.activeElement),step=['ArrowLeft','ArrowUp'].includes(event.key)?-1:1;let next=(index+step+buttons.length)%buttons.length;if(event.key==='Home')next=0;if(event.key==='End')next=buttons.length-1;buttons[next].focus();}
     function cancelRestart(){confirmRestart.value=false;game.state=stateBeforeConfirm;last=performance.now();sync();save();void nextTick(()=>board.value?.focus({preventScroll:true}));}
     function toggleSound(){sound.value=!sound.value;audio.enabled=sound.value;write('sound',String(sound.value));if(sound.value)audio.unlock();else audio.stop();}
+    function unlockAudio(){audio.unlock();}
     function route(){
       pause();levelsOpen.value=false;confirmRestart.value=false;expanded.value=false;audio.stop();
       sessions[gameId]=game;
@@ -95,11 +97,11 @@
     function flushInputClock(){const now=performance.now();if(isNativePage()&&!document.hidden&&!confirmRestart.value&&game.state==='playing'){game.advance(Math.min(now-(last||now),250));sync();}last=now;}
     function touchMove(direction,event){audio.unlock();if(game.state!=='playing'||confirmRestart.value)return;flushInputClock();event.currentTarget.setPointerCapture?.(event.pointerId);game.turn(direction);focusBoard();}
     function releaseDirection(direction){flushInputClock();game.turn(direction,false);}
-    function keyup(event){if(!isNativePage())return;if((isBoulder.value&&['Space','ShiftLeft','ShiftRight'].includes(event.code))||(isZaby.value&&event.code==='Space'))releaseDirection('action');if(isZaby.value&&event.code==='KeyR')releaseDirection('newFrog');if(keyDirections[event.code])releaseDirection(keyDirections[event.code]);}
+    function keyup(event){if(!isNativePage())return;if(((isBoulder.value||isManic.value)&&['Space','ShiftLeft','ShiftRight'].includes(event.code))||(isZaby.value&&event.code==='Space'))releaseDirection('action');if(isZaby.value&&event.code==='KeyR')releaseDirection('newFrog');if(keyDirections[event.code])releaseDirection(keyDirections[event.code]);}
     function trapFocus(event){const buttons=event.currentTarget.querySelectorAll('button:not(:disabled)');const first=buttons[0],lastButton=buttons[buttons.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();lastButton.focus();}else if(!event.shiftKey&&document.activeElement===lastButton){event.preventDefault();first.focus();}}
     const keyDirections={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',KeyW:'up',KeyS:'down',KeyA:'left',KeyD:'right'};
     function keydown(event){
-      if(event.defaultPrevented||event.isComposing||event.ctrlKey||event.altKey||event.metaKey||(event.shiftKey&&!isBoulder.value))return;
+      if(event.defaultPrevented||event.isComposing||event.ctrlKey||event.altKey||event.metaKey||(event.shiftKey&&!isBoulder.value&&!isManic.value))return;
       if(event.target.closest?.('input,select,textarea,[contenteditable="true"]'))return;
       if(page.value==='flappy')return;
       audio.unlock();
@@ -115,14 +117,14 @@
       if(isZaby.value&&event.code==='KeyR'){event.preventDefault();if(game.state==='playing'){flushInputClock();game.turn('newFrog');}return;}
       if(event.target.closest?.('button,a'))return;
       if(['Enter','Space'].includes(event.code)&&game.state!=='playing'){event.preventDefault();if(!event.repeat)primaryAction();return;}
-      if((isBoulder.value&&['Space','ShiftLeft','ShiftRight'].includes(event.code))||(isZaby.value&&event.code==='Space')){event.preventDefault();if(game.state==='playing'){flushInputClock();game.turn('action');}return;}
+      if(((isBoulder.value||isManic.value)&&['Space','ShiftLeft','ShiftRight'].includes(event.code))||(isZaby.value&&event.code==='Space')){event.preventDefault();if(game.state==='playing'){flushInputClock();game.turn('action');}return;}
       if(keyDirections[event.code]){event.preventDefault();if(game.state==='playing'){flushInputClock();game.turn(keyDirections[event.code]);}}
     }
     function visibility(){if(document.hidden)pause();}
     function blur(){pause();audio.stop();}
     function frame(now){
       const dt=Math.min(now-(last||now),250);last=now;
-      if(isNativePage()&&!document.hidden&&!confirmRestart.value&&game.state==='playing'){
+      if(isNativePage()&&!document.hidden&&!confirmRestart.value&&(game.state==='playing'||(isManic.value&&game.state==='ready'&&document.hasFocus()))){
         game.advance(dt);sync();
         if(now-lastSavedAt>=1000){save();lastSavedAt=now;}
       }
@@ -141,6 +143,6 @@
       if(!isFile)fetch('commit.json',{cache:'no-cache'}).then(r=>r.json()).then(m=>{if(m.version===version&&/^[a-f0-9]{7,40}$/.test(m.commit))commit.value=m.commit.slice(0,7);}).catch(()=>{});
     });
     onUnmounted(()=>{cancelAnimationFrame(frameId);audio.stop();document.body.classList.remove('pampuch-expanded');window.removeEventListener('resize',sizeExpanded);window.visualViewport?.removeEventListener('resize',sizeExpanded);window.removeEventListener('hashchange',route);window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);window.removeEventListener('pagehide',save);document.removeEventListener('visibilitychange',visibility);});
-    return{t,gameText,language,palette,palettes,sound,toggleSound,page,isBoulder,isAuto,isPampuch,isZaby,board,primary,flappy,expanded,expandedWidth,globalControlsWidth,landscapeControls,showHelp,confirmRestart,status,score,best,level,lives,remaining,announcement,version,commit,isFile,year,touchDirections,overlayTitle,overlayText,primaryText,primaryAction,togglePause,requestRestart,cancelRestart,focusBoard,touchMove,releaseDirection,trapFocus,storageAvailable,completedMaps,levelsOpen,levelPicker,levelTrigger,currentMap,maps,canChooseMap,openLevels,closeLevels,chooseMap,levelKeys};
+    return{t,gameText,language,palette,palettes,sound,toggleSound,unlockAudio,page,isBoulder,isAuto,isPampuch,isZaby,isManic,board,primary,flappy,expanded,expandedWidth,globalControlsWidth,landscapeControls,showHelp,confirmRestart,status,score,best,level,lives,remaining,announcement,version,commit,isFile,year,touchDirections,overlayTitle,overlayText,primaryText,primaryAction,togglePause,requestRestart,cancelRestart,focusBoard,touchMove,releaseDirection,trapFocus,storageAvailable,completedMaps,levelsOpen,levelPicker,levelTrigger,currentMap,maps,canChooseMap,openLevels,closeLevels,chooseMap,levelKeys};
   }}).mount('#app');
 })();
