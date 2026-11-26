@@ -1,5 +1,46 @@
 # Sources and fidelity
 
+## MANIC2+3
+
+Original: **VBG Software, 1987** (Vlastimil Veselý, Libor Bedrlík, Ladislav
+Gavar), documented in the [Manic Miner catalogue](https://pmd85.borik.net/wiki/Manic_Miner).
+The runtime uses the **MANIC2+3** record from `games-vbg.ptp` in
+[the VBG archive](https://pmd85.borik.net/?action=download&did=8), not the
+separate MANIC23c cheat edition. It has 22 connected rooms and 139 keys.
+
+- Tape SHA-256: `1d7884b3da76f610ef2ab5dcedead68ccdde8ca6d0f5eef2a2cd64ab5cfbeec5`.
+- Loaded 32-KiB program SHA-256: `ae71af00a768b23aa244b91eb903a3d088203c3ef1c6844ebeb21a2b10ced295`.
+
+`tools/import-manic2.mjs path/to/games-vbg.ptp` runs the original loader
+with cassette bytes supplied through USART ports 1Eh/1Fh. Runtime starts the
+loaded program at 0230h and executes its overview initializer before stopping
+at 0238h for the ready screen. Its native mosaic is also exported as the card
+PNG. The original title tune loops while waiting for input. Native EOL selects
+normal play; T selects training. The browser maps these two inputs from a mode
+selector rather than patching the program. Native play starts in room 2.
+
+Left/right map to columns 12/14, bit 2. Jump clears left-SHIFT bit 5 in the
+keyboard return; the native scanner requires it together with a direction.
+Right-SHIFT bit 6 remains released. All movement, enemies, collisions, room
+loads, nine total initial lives (eight reserves plus the active player), key
+collection and PIO writes execute original instructions. Normal deaths consume
+reserves; training bypasses that decrement and keeps the final gate locked.
+**Contrary to the catalogue description, this archived program's timer still
+counts down and expires in training.** The browser preserves observed native
+behavior. The final gate checks 139 keys in room 21; room 22 invokes the native
+congratulations routine. Execution stops at 23E8h after that text, before its
+keyboard wait. Game over stops at 17F0h before the original menu restarts.
+
+The browser adds translated help, mode selection, pause, touch input and
+independent full-machine saves. Tests cover both native mode inputs, original
+audio, four movement/jump codes, frame partition invariance, loading all 22
+distinct room matrices, nine normal deaths, training deaths, timer expiration
+in both modes, native key counting, congratulations and save restoration.
+Room/death/timeout/victory fixtures exercise native branches; they do not claim
+a complete manual playthrough. Shared CPU diagnostics and independent Pampuch
+traces remain required. The hardware and archival-rights limits below apply.
+
+
 ## Cihly / Bricks / ZED
 
 Original: **ZED, R. D.**, listed for PMD 85-1/2/2A/3 in the

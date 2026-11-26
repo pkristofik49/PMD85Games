@@ -5,7 +5,7 @@
 A Vue collection of PMD 85 game reimplementations. First card: **Flappy**.
 Second card: **Pampúch & Duch**. Third card: **Boulder Dash**. Fourth card: **Auto**.
 Fifth card: **Žáby / Frogs**. Sixth card: **Manic Miner**.
-Seventh card: **Cihly / Bricks**.
+Seventh card: **Cihly / Bricks**. Eighth card: **MANIC2+3**.
 Structure and development rules follow
 [SMG](https://github.com/pkristofik49/SMG): local Vue 3.5.45, static HTML/CSS/JS,
 native browser APIs, no other runtime library or npm installation.
@@ -21,7 +21,7 @@ node tools/serve.mjs
 
 Open **http://127.0.0.1:4173/PMD85Games/**. Paths also support a server root and
 GitHub Pages under `/PMD85Games/`. Direct `file://` opening supports the menu and
-Pampuch, Boulder Dash, Auto, Frogs, Manic Miner and Bricks; Flappy's ES modules and offline support require HTTP/HTTPS.
+Pampuch, Boulder Dash, Auto, Frogs, Manic Miner, Bricks and MANIC2+3; Flappy's ES modules and offline support require HTTP/HTTPS.
 
 ## Games and controls
 
@@ -42,7 +42,7 @@ Pampuch, Boulder Dash, Auto, Frogs, Manic Miner and Bricks; Flappy's ES modules 
   include a round action button. The original E/Y/left/right/Shift matrix is
   mapped without modifying the game program. P/Escape, N, H, F and Z work as in
   Pampuch. Saves use the separate `pmd85games.boulder.v1` key with complete CPU,
-  RAM and sound phase; reloading restores paused. All seven games work offline
+  RAM and sound phase; reloading restores paused. All eight games work offline
   after the updated service worker has installed successfully.
 - `#/auto`: **AUTO by R. D.**, the original PMD program from `games-1.ptp`.
   Drive five laps along the original winding road with as few crashes as possible.
@@ -84,6 +84,19 @@ Pampuch, Boulder Dash, Auto, Frogs, Manic Miner and Bricks; Flappy's ES modules 
   record. A separate full-machine save uses `pmd85games.cihly.v1`; active games
   restore paused. The card shows the native board because this game has no
   separate title screen. No library is added; its publication year is unknown.
+
+- `#/manic2`: **MANIC2+3 (VBG Software, 1987)**, the original connected map
+  of 22 rooms and 139 keys. Choose normal play or training on the ready screen
+  or new-game confirmation. The original overview, title melody, enemies,
+  platforms, deaths, room transitions and PIO audio execute on the shared PMD
+  core. Move with left/right or A/D; hold a direction together with Space/Shift
+  to jump. Phones have two direction buttons and a separate jump button.
+  P/Escape, Enter, N, H, F and Z work as in Pampuch. Training preserves lives
+  but locks the final gate; the timer still runs in this archived program.
+  Original HUD pixels remain intact. Saves use `pmd85games.manic2.v1` and restore
+  active play paused. Native congratulations run before the victory overlay.
+  No library was added. Reproduce assets with
+  `node tools/import-manic2.mjs path/to/games-vbg.ptp`.
 
 Reproduce Boulder assets without dependencies using
 `node tools/import-boulder.mjs path/to/games-vbg.ptp`; see [SOURCES.md](SOURCES.md).
@@ -140,7 +153,7 @@ cross-device synchronization. Native Pampuch snapshots use `pmd85games.pampuch.v
 and include RAM, CPU state and divider phase. Incompatible approximate v1 games
 start fresh; the old save is left untouched. Best scores/settings are retained.
 
-The optional PWA caches both games and all runtime assets after a complete first
+The optional PWA caches all eight games and all runtime assets after a complete first
 online load. Installation requires HTTPS or localhost. Updates wait for old
 windows to close without interrupting play. Offline use before the initial
 installation is complete is unavailable. Clearing browser data removes saves
@@ -187,7 +200,7 @@ requires a C compiler and separate source checkouts; see `SOURCES.md`.
 Optional browser checks require the development server and Chrome headless with
 an isolated user-data directory and `--remote-debugging-port=9333`. Run
 `node tools/browser-check.mjs`. It tests desktop/mobile, gameplay, saves,
-translations, palettes, Flappy and both games offline. It clears storage on the
+translations, palettes, Flappy and all eight games offline. It clears storage on the
 tested local origin and saves ignored screenshots under `test-results/`.
 With the same isolated Chrome running, `node tools/render-icons.mjs` regenerates
 the PNG icons from `icons/icon.svg`. The approved pixel icon shows PMD above 85;
@@ -206,7 +219,7 @@ hook synchronizes `js/version.js`, `sw.js` and `commit.json`. Stage edits to the
 files before committing. The footer shows the version and available short
 commit hash; the development server and publishing tool supply that hash.
 
-The workflow checks both games and packages the static app with
+The workflow checks the collection and Flappy and packages the static app with
 `node tools/package.mjs`, then publishes `dist/` on pushes to `main`. Set
 **Settings → Pages → Source: GitHub Actions** in the repository and enable
 Actions/Pages. Intended URL: **https://pkristofik49.github.io/PMD85Games/**.

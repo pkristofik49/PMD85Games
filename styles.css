@@ -65,3 +65,8 @@ body.pampuch-expanded{overflow:hidden}
 
 /* Original Cihly board thumbnail; steering uses the existing two-button pad. */
 .cihly-art img{image-rendering:pixelated;object-fit:contain;background:#000}
+
+/* Original VBG mosaic and native game/training choice. */
+.manic2-art img{image-rendering:pixelated;object-fit:contain;background:#000}
+.native-mode{max-width:100%;min-height:42px;padding:8px 14px;border:1px solid #a1b780;border-radius:7px;background:#172016;color:#eeeede;font:inherit}
+@media(max-width:700px),(max-height:520px){.mode-overlay{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:center;gap:8px;padding:12px;overflow-y:auto}.mode-overlay .overlay-mark{display:none}.mode-overlay h2,.mode-overlay p,.mode-overlay select{grid-column:1/-1}.mode-overlay select{justify-self:center}.mode-overlay .primary-button:last-child{grid-column:1/-1;justify-self:center}.mode-overlay button{min-height:44px;padding-inline:8px}}
