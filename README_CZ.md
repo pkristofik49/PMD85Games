@@ -5,7 +5,7 @@
 Vue sbírka reimplementací her z PMD 85. První karta: **Flappy**.
 Druhá karta: **Pampúch & Duch**. Třetí karta: **Boulder Dash**. Čtvrtá karta: **Auto**.
 Pátá karta: **Žáby / Frogs**. Šestá karta: **Manic Miner**.
-Sedmá karta: **Cihly / Bricks**. Osmá karta: **MANIC2+3**.
+Sedmá karta: **Cihly / Bricks**. Osmá karta: **MANIC2+3**. Devátá karta: **Saboter / Saboteur**.
 Struktura a pravidla vývoje vycházejí ze
 [SMG](https://github.com/pkristofik49/SMG): lokální Vue 3.5.45, statické HTML/CSS/JS,
 nativní API prohlížeče, žádná další běhová knihovna ani instalace npm balíčků.
@@ -21,7 +21,7 @@ node tools/serve.mjs
 
 Otevřete **http://127.0.0.1:4173/PMD85Games/**. Cesty podporují i kořen serveru
 a GitHub Pages pod `/PMD85Games/`. Přímé otevření přes `file://` podporuje menu
-a Pampucha, Boulder Dash, Auto, Žáby, Manic Miner, Cihly i MANIC2+3; ES moduly Flappyho a offline podpora vyžadují HTTP/HTTPS.
+a Pampucha, Boulder Dash, Auto, Žáby, Manic Miner, Cihly, MANIC2+3 i Saboter; ES moduly Flappyho a offline podpora vyžadují HTTP/HTTPS.
 
 ## Hry a ovládání
 
@@ -77,7 +77,7 @@ a Pampucha, Boulder Dash, Auto, Žáby, Manic Miner, Cihly i MANIC2+3; ES moduly
   původní PIO výstupy. Ukládání používá `pmd85games.manic.v1`: úvod se obnoví
   v uložené pozici, rozehraná hra pozastavená. Zadávání jména do původní tabulky
   rekordů nahrazuje webový konec hry. Karta používá původní úvodní obrazovku;
-  nepřibyla knihovna. Všech osm her je dostupných offline.
+  nepřibyla knihovna. Všech devět her je dostupných offline.
 - `#/cihly`: **Cihly / Bricks (ZED, R. D.)**, převzaté bajt po bajtu z původní
   pásky. PMD program řídí vozík, míček, odrazy, mazání cihel, body, tři míčky,
   závěrečnou animaci i zvuky. Pohyb: ←/→ nebo A/D; na telefonu jsou dvě směrová
@@ -100,6 +100,19 @@ a Pampucha, Boulder Dash, Auto, Žáby, Manic Miner, Cihly i MANIC2+3; ES moduly
   obnoví pozastavenou. Před webovým překryvem vítězství se vykreslí původní
   gratulace. Nepřibyla knihovna. Podklady obnoví příkaz
   `node tools/import-manic2.mjs cesta/ke/games-vbg.ptp`.
+
+- `#/saboter`: **SABO +4 / Saboter (VBG Software, 1989)**, původní tajná
+  mise v nepřátelském komplexu. PMD program řídí prostředí, nepřátele, souboje,
+  inventář, granáty, aktivační kódy, energii, čas i závěrečné zprávy. Pohyb:
+  šipky/WASD. Pro skok držte současně směr a nahoru; nahoru také útočí nebo
+  stoupá po žebříku, dolů slouží k přikrčení a sestupu. Mezerník/Shift sbírá,
+  používá či hází předměty. Na telefonu je směrový kříž a kulatá akce.
+  P/Escape, Enter, N, H, F a Z fungují jako u Pampucha. Před hrou se zobrazuje
+  původní menu s hudbou; start zvolí původní ovládání klávesnicí a potvrdí
+  přání štěstí. Před webovým překryvem doběhnou původní zprávy o úspěchu či
+  neúspěchu. Úplné CPU/RAM ukládání používá `pmd85games.saboter.v1`;
+  rozehraná hra se obnoví pozastavená. Nepřibyla knihovna. Podklady obnoví
+  `node tools/import-saboter.mjs cesta/ke/games-vbg.ptp`.
 
 Podklady lze znovu importovat bez závislostí příkazem
 `node tools/import-boulder.mjs cesta/ke/games-vbg.ptp`; viz [SOURCES.md](SOURCES.md).

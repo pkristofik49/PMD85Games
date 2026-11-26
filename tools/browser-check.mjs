@@ -25,7 +25,7 @@ try{
  await call('Storage.clearDataForOrigin',{origin:new URL(base).origin,storageTypes:'all'});
  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
  await call('Page.navigate',{url:base});
- await until(`document.querySelectorAll('.game-card').length===8 && !document.querySelector('#app').hasAttribute('v-cloak')`);
+ await until(`document.querySelectorAll('.game-card').length===9 && !document.querySelector('#app').hasAttribute('v-cloak')`);
  await screenshot('menu-desktop.png');
  assert.equal(await evaluate(`document.querySelector('.game-card').dataset.game`),'flappy');
  await until(`document.querySelector('[data-game="pampuch"] img')?.naturalWidth>0`);
@@ -113,7 +113,7 @@ try{
  await evaluate(`document.querySelector('.level-trigger').click()`);await until(`document.querySelector('#pampuch-levels')`);
  assert.equal(await evaluate(`document.querySelector('[data-map="3"]').disabled`),true);
  await press('Escape','Escape');await until(`!document.querySelector('#pampuch-levels')`);
- await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===8`);
+ await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===9`);
  assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);await screenshot('menu-mobile.png');
  await evaluate(`document.querySelector('[data-game="flappy"]').click()`);
  await until(`document.querySelector('iframe')?.contentDocument.querySelector('.title-screen img')?.naturalWidth>0`);
@@ -205,7 +205,7 @@ try{
  await until(`document.querySelector('.application').classList.contains('landscape-controls')`);await delay(150);
  assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
  await screenshot('zaby-landscape.png');await press('KeyF','f');
- await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===8`);
+ await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===9`);
  const buffersBefore=await evaluate(`window.__pmdBuffers.length`);
  await evaluate(`document.querySelector('[data-game="manic"]').click()`);await until(`document.querySelector('canvas[data-state="ready"]')`);
  assert.equal(await evaluate(`document.querySelector('#game-title').textContent`),'Manic Miner');
@@ -269,7 +269,7 @@ try{
  assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
  await screenshot('cihly-landscape.png');await press('KeyF','f');
  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
- await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===8`);
+ await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===9`);
  const beforeManic2=await evaluate(`window.__pmdBuffers.length`);
  await evaluate(`document.querySelector('[data-game="manic2"]').click()`);await until(`document.querySelector('canvas[data-state="ready"]')`);
  assert.equal(await evaluate(`document.querySelector('#game-title').textContent`),'MANIC2+3');
@@ -305,11 +305,40 @@ try{
  await until(`document.querySelector('.application').classList.contains('landscape-controls')`);await delay(150);
  assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
  await screenshot('manic2-landscape.png');await press('KeyF','f');
- // The root service worker must cache all eight games, including the embedded module graph.
+ await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
+ await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===9`);
+ const beforeSaboter=await evaluate(`window.__pmdBuffers.length`);
+ await evaluate(`document.querySelector('[data-game="saboter"]').click()`);await until(`document.querySelector('canvas[data-state="ready"]')`);
+ assert.equal(await evaluate(`document.querySelector('#game-title').textContent`),'Saboteur');
+ await delay(300);assert.ok(await evaluate(`window.__pmdBuffers.length`)>beforeSaboter,'Native Saboter menu music reaches Web Audio');
+ await screenshot('saboter-title.png');await evaluate(`document.querySelector('.primary-button').click()`);
+ await call('Input.dispatchKeyEvent',{type:'keyDown',code:'ArrowRight',key:'ArrowRight'});await delay(2200);
+ await call('Input.dispatchKeyEvent',{type:'keyUp',code:'ArrowRight',key:'ArrowRight'});await press('KeyP','p');await until(`document.querySelector('canvas[data-state="paused"]')`);
+ const rightSaboter=await evaluate(`JSON.parse(localStorage.getItem('pmd85games.saboter.v1'))`);
+ assert.ok(rightSaboter.machine.ram[0x6a6d]>15,'Right input moves the native player');
+ await evaluate(`document.querySelector('.primary-button').click()`);
+ await call('Input.dispatchKeyEvent',{type:'keyDown',code:'ArrowLeft',key:'ArrowLeft'});await delay(350);
+ await call('Input.dispatchKeyEvent',{type:'keyUp',code:'ArrowLeft',key:'ArrowLeft'});await press('KeyP','p');await until(`document.querySelector('canvas[data-state="paused"]')`);
+ const saboterSave=await evaluate(`JSON.parse(localStorage.getItem('pmd85games.saboter.v1'))`);
+ assert.equal(saboterSave.game,'saboter');assert.ok(saboterSave.machine.ram[0x6a6d]<rightSaboter.machine.ram[0x6a6d]);assert.equal(saboterSave.result,null);
+ assert.equal(await evaluate(`document.querySelector('.board-overlay p').textContent`),'The secret mission can wait.');
+ const savedManic2=await evaluate(`localStorage.getItem('pmd85games.manic2.v1')`);
+ await call('Page.reload');await until(`document.querySelector('canvas[data-state="paused"]')`);
+ assert.deepEqual(await evaluate(`JSON.parse(localStorage.getItem('pmd85games.saboter.v1')).machine.cpu`),saboterSave.machine.cpu);
+ assert.equal(await evaluate(`localStorage.getItem('pmd85games.manic2.v1')`),savedManic2,'Other native saves remain independent');
+ await press('KeyN','n');await until(`document.querySelector('.secondary-button')`);await press('Escape','Escape');
+ await screenshot('saboter-desktop.png');
+ await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+ assert.equal(await evaluate(`document.querySelectorAll('.direction-pad button').length`),5);assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);await screenshot('saboter-mobile.png');
+ await press('KeyF','f');await call('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:1,mobile:true});
+ await until(`document.querySelector('.application').classList.contains('landscape-controls')`);await delay(150);
+ assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
+ await screenshot('saboter-landscape.png');await press('KeyF','f');
+ // The root service worker must cache all nine games, including the embedded module graph.
  await until(`navigator.serviceWorker.getRegistration().then(r=>!!r?.active)`);
  await call('Page.reload');await until(`navigator.serviceWorker.controller!==null`);
  await call('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
- await evaluate(`location.hash='#/'`);await call('Page.reload');await until(`document.querySelectorAll('.game-card').length===8`);
+ await evaluate(`location.hash='#/'`);await call('Page.reload');await until(`document.querySelectorAll('.game-card').length===9`);
  await evaluate(`location.hash='#/flappy'`);await until(`document.querySelector('iframe')?.contentDocument.querySelector('.title-screen img')?.naturalWidth>0`);
  await evaluate(`location.hash='#/pampuch'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  await evaluate(`location.hash='#/boulder'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
@@ -318,9 +347,10 @@ try{
  await evaluate(`location.hash='#/manic'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  await evaluate(`location.hash='#/cihly'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  await evaluate(`location.hash='#/manic2'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
+ await evaluate(`location.hash='#/saboter'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  assert.equal(errors.length,0,errors.join('\n'));
  await call('Page.removeScriptToEvaluateOnNewDocument',{identifier:instrumentation.identifier});
- console.log('Browser checks passed: desktop, mobile, gameplay, pause, reload, translations, palettes and all eight games offline.');
+ console.log('Browser checks passed: desktop, mobile, gameplay, pause, reload, translations, palettes and all nine games offline.');
 }finally{
  await call('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});ws.close();
 }

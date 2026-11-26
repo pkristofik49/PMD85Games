@@ -1,5 +1,52 @@
 # Sources and fidelity
 
+## Saboter / Saboteur / SABO +4
+
+Original: **VBG Software, 1989** (Vlastimil Veselý, Libor Bedrlík, Ladislav
+Gavar). The [Saboter catalogue](https://pmd85.borik.net/wiki/Saboter) identifies
+SABO +4 for PMD 85-1/2/2A/3 and describes its activation-code mission, armed
+guards and grenade-vulnerable defense control center. The native information
+page credits VBG-SOFT, 13 February 1989. The title is SABOTER in the PMD menu.
+
+Source: the `SABO  +4` record from `games-vbg.ptp` in
+[the VBG archive](https://pmd85.borik.net/?action=download&did=8).
+
+- Tape SHA-256: `1d7884b3da76f610ef2ab5dcedead68ccdde8ca6d0f5eef2a2cd64ab5cfbeec5`.
+- Loaded 32-KiB program SHA-256: `ae9be90f5fabd365983d9e753c0a360ba2a9b0dfb63c816a3708cea688df9774`.
+
+`node tools/import-saboter.mjs path/to/games-vbg.ptp` extracts the 198-byte
+bootstrap at 7F3Bh and runs its successful-load entry at 7F82h (following the
+checksum-result branch at 7F7Fh). Cassette bytes enter through native USART
+ports 1Eh/1Fh. Import stops at the loader's jump to 7189h, preserving the loaded
+program. Runtime starts there with SP=7FF0h, executes its original decompressor
+and initializes the menu at 25A1h. The PNG card is rendered from this native
+menu. Ready-screen music uses the original PIO writes. Starting supplies the
+native zero/menu input (column 9), then acknowledges its good-luck key wait.
+The default native keyboard table is retained; the browser does not expose
+joystick setup, keyboard redefinition, tape loading or monitor exit.
+
+Browser directions map to native left (column 12, bit 2), right (14, bit 2),
+up (2, bit 2) and down (1, bit 4). Space/Shift maps to the native item action
+(column 10, bit 4), rather than the hardware SHIFT abort line. Direction plus
+up jumps, up also attacks/climbs, and down crouches/descends. Original
+instructions own all motion, scenery, room transitions, enemies, collision,
+combat, inventory, grenades, activation codes, energy and timer. Its original
+TV frame and HUD remain in the framebuffer. The web layer adds pause, touch
+controls, translated help and independent full-machine saves. Active play
+restores paused; the native title tune resumes at its saved position.
+
+The browser observes the result returned to 267Ah: 6 is successful escape,
+10 timeout, 11 incorrect code, and 12 exhausted energy. It lets the native
+result animation/music/text execute, then stops at 26ACh before another key
+wait. Native final screens remain behind the translated outcome overlay.
+Tests cover the program hash, title, music, all five input bits, movement and
+jumping, a continuous route across several rooms, native grenade pickup,
+frame partition invariance, all four outcome messages and full save/restore.
+Item/outcome fixtures exercise original branches and do not claim a complete
+manual playthrough. Existing independent CPU diagnostics and Pampuch traces
+remain required; hardware and archival-rights limits below apply.
+
+
 ## MANIC2+3
 
 Original: **VBG Software, 1987** (Vlastimil Veselý, Libor Bedrlík, Ladislav

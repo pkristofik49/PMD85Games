@@ -34,11 +34,12 @@
     const storedBest=Number(read('pampuch.best','0'));const best=ref(Number.isSafeInteger(storedBest)&&storedBest>=0?storedBest:0);
     const version=ArcadeVersion,commit=ref(''),isFile=location.protocol==='file:',year=new Date().getFullYear();
     let game;try{game=Pampuch.restore(JSON.parse(read('pampuch.v2','null')));}catch{}game??=new Pampuch();
-    const sessions={pampuch:game},gameTypes={pampuch:Pampuch,boulder:Boulder,auto:AutoGame,zaby:ZabyGame,manic:ManicGame,cihly:CihlyGame,manic2:Manic2Game};let gameId='pampuch';
+    const sessions={pampuch:game},gameTypes={pampuch:Pampuch,boulder:Boulder,auto:AutoGame,zaby:ZabyGame,manic:ManicGame,cihly:CihlyGame,manic2:Manic2Game,saboter:SaboterGame};let gameId='pampuch';
     const isBoulder=computed(()=>page.value==='boulder');
     const isAuto=computed(()=>page.value==='auto'),isPampuch=computed(()=>page.value==='pampuch');
     const isZaby=computed(()=>page.value==='zaby');
     const isManic=computed(()=>page.value==='manic');
+    const isSaboter=computed(()=>page.value==='saboter');
     const isCihly=computed(()=>page.value==='cihly');
     const isManic2=computed(()=>page.value==='manic2'),manic2Mode=ref('normal');
     const isPlatformer=computed(()=>isManic.value||isManic2.value);
@@ -55,7 +56,7 @@
     const overlayKey=computed(()=>confirmRestart.value?'confirm':({ready:'ready',paused:'paused',dead:'dead',over:'over',won:'won',level:'level'}[status.value]??'ready'));
     const gameText=(suffix,fallback)=>t(isPampuch.value?fallback:page.value+suffix);
     const overlayTitle=computed(()=>!confirmRestart.value&&status.value==='ready'?gameText('Ready','ready'):isAuto.value&&!confirmRestart.value&&status.value==='over'?t('autoFinished'):t(overlayKey.value));
-    const overlayText=computed(()=>((isAuto.value||isZaby.value||isPlatformer.value||isCihly.value)&&!confirmRestart.value&&status.value==='paused'?gameText('PausedText',''):!isPampuch.value&&!confirmRestart.value&&['ready','over','won'].includes(status.value)?gameText((status.value==='ready'?'Ready':status.value==='won'?'Won':'Over')+'Text',''):t(overlayKey.value+'Text')).replace('{crashes}',String(score.value)));
+    const overlayText=computed(()=>((isAuto.value||isZaby.value||isPlatformer.value||isCihly.value||isSaboter.value)&&!confirmRestart.value&&status.value==='paused'?gameText('PausedText',''):!isPampuch.value&&!confirmRestart.value&&['ready','over','won'].includes(status.value)?gameText((status.value==='ready'?'Ready':status.value==='won'?'Won':'Over')+'Text',''):t(overlayKey.value+'Text')).replace('{crashes}',String(score.value)));
     const primaryText=computed(()=>t(confirmRestart.value?'new':status.value==='ready'?'start':['over','won'].includes(status.value)?'new':status.value==='level'?'next':'resume'));
     const touchDirections=computed(()=>isZaby.value?[{name:'newFrog',symbol:'↻'},{name:'up',symbol:'↑'}]:[{name:'up',symbol:'↑'},{name:'left',symbol:'←'},{name:'down',symbol:'↓'},{name:'right',symbol:'→'}].filter(d=>!(isAuto.value||isPlatformer.value||isCihly.value)||['left','right'].includes(d.name)));
     const saveKey=id=>id==='pampuch'?'pampuch.v2':id+'.v1';
@@ -101,11 +102,11 @@
     function flushInputClock(){const now=performance.now();if(isNativePage()&&!document.hidden&&!confirmRestart.value&&game.state==='playing'){game.advance(Math.min(now-(last||now),250));sync();}last=now;}
     function touchMove(direction,event){audio.unlock();if(game.state!=='playing'||confirmRestart.value)return;flushInputClock();event.currentTarget.setPointerCapture?.(event.pointerId);game.turn(direction);focusBoard();}
     function releaseDirection(direction){flushInputClock();game.turn(direction,false);}
-    function keyup(event){if(!isNativePage())return;if(((isBoulder.value||isPlatformer.value)&&['Space','ShiftLeft','ShiftRight'].includes(event.code))||(isZaby.value&&event.code==='Space'))releaseDirection('action');if(isZaby.value&&event.code==='KeyR')releaseDirection('newFrog');if(keyDirections[event.code])releaseDirection(keyDirections[event.code]);}
+    function keyup(event){if(!isNativePage())return;if(((isBoulder.value||isPlatformer.value||isSaboter.value)&&['Space','ShiftLeft','ShiftRight'].includes(event.code))||(isZaby.value&&event.code==='Space'))releaseDirection('action');if(isZaby.value&&event.code==='KeyR')releaseDirection('newFrog');if(keyDirections[event.code])releaseDirection(keyDirections[event.code]);}
     function trapFocus(event){const buttons=event.currentTarget.querySelectorAll('button:not(:disabled),select:not(:disabled),input:not(:disabled)');const first=buttons[0],lastButton=buttons[buttons.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();lastButton.focus();}else if(!event.shiftKey&&document.activeElement===lastButton){event.preventDefault();first.focus();}}
     const keyDirections={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',KeyW:'up',KeyS:'down',KeyA:'left',KeyD:'right'};
     function keydown(event){
-      if(event.defaultPrevented||event.isComposing||event.ctrlKey||event.altKey||event.metaKey||(event.shiftKey&&!isBoulder.value&&!isPlatformer.value))return;
+      if(event.defaultPrevented||event.isComposing||event.ctrlKey||event.altKey||event.metaKey||(event.shiftKey&&!isBoulder.value&&!isPlatformer.value&&!isSaboter.value))return;
       if(event.target.closest?.('input,select,textarea,[contenteditable="true"]'))return;
       if(page.value==='flappy')return;
       audio.unlock();
@@ -121,14 +122,14 @@
       if(isZaby.value&&event.code==='KeyR'){event.preventDefault();if(game.state==='playing'){flushInputClock();game.turn('newFrog');}return;}
       if(event.target.closest?.('button,a'))return;
       if(['Enter','Space'].includes(event.code)&&game.state!=='playing'){event.preventDefault();if(!event.repeat)primaryAction();return;}
-      if(((isBoulder.value||isPlatformer.value)&&['Space','ShiftLeft','ShiftRight'].includes(event.code))||(isZaby.value&&event.code==='Space')){event.preventDefault();if(game.state==='playing'){flushInputClock();game.turn('action');}return;}
+      if(((isBoulder.value||isPlatformer.value||isSaboter.value)&&['Space','ShiftLeft','ShiftRight'].includes(event.code))||(isZaby.value&&event.code==='Space')){event.preventDefault();if(game.state==='playing'){flushInputClock();game.turn('action');}return;}
       if(keyDirections[event.code]){event.preventDefault();if(game.state==='playing'){flushInputClock();game.turn(keyDirections[event.code]);}}
     }
     function visibility(){if(document.hidden)pause();}
     function blur(){pause();audio.stop();}
     function frame(now){
       const dt=Math.min(now-(last||now),250);last=now;
-      if(isNativePage()&&!document.hidden&&!confirmRestart.value&&(game.state==='playing'||(isPlatformer.value&&game.state==='ready'&&document.hasFocus()))){
+      if(isNativePage()&&!document.hidden&&!confirmRestart.value&&(game.state==='playing'||((isPlatformer.value||isSaboter.value)&&game.state==='ready'&&document.hasFocus()))){
         game.advance(dt);sync();
         if(now-lastSavedAt>=1000){save();lastSavedAt=now;}
       }
@@ -148,6 +149,6 @@
       if(!isFile)fetch('commit.json',{cache:'no-cache'}).then(r=>r.json()).then(m=>{if(m.version===version&&/^[a-f0-9]{7,40}$/.test(m.commit))commit.value=m.commit.slice(0,7);}).catch(()=>{});
     });
     onUnmounted(()=>{cancelAnimationFrame(frameId);audio.stop();document.body.classList.remove('pampuch-expanded');window.removeEventListener('resize',sizeExpanded);window.visualViewport?.removeEventListener('resize',sizeExpanded);window.removeEventListener('hashchange',route);window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);window.removeEventListener('pagehide',save);document.removeEventListener('visibilitychange',visibility);});
-    return{t,gameText,language,palette,palettes,sound,toggleSound,unlockAudio,page,isBoulder,isAuto,isPampuch,isZaby,isManic,isCihly,isManic2,isPlatformer,manic2Mode,board,primary,flappy,expanded,expandedWidth,globalControlsWidth,landscapeControls,showHelp,confirmRestart,status,score,best,level,lives,remaining,announcement,version,commit,isFile,year,touchDirections,overlayTitle,overlayText,primaryText,primaryAction,togglePause,requestRestart,cancelRestart,focusBoard,touchMove,releaseDirection,trapFocus,storageAvailable,completedMaps,levelsOpen,levelPicker,levelTrigger,currentMap,maps,canChooseMap,openLevels,closeLevels,chooseMap,levelKeys};
+    return{t,gameText,language,palette,palettes,sound,toggleSound,unlockAudio,page,isBoulder,isAuto,isPampuch,isZaby,isManic,isCihly,isSaboter,isManic2,isPlatformer,manic2Mode,board,primary,flappy,expanded,expandedWidth,globalControlsWidth,landscapeControls,showHelp,confirmRestart,status,score,best,level,lives,remaining,announcement,version,commit,isFile,year,touchDirections,overlayTitle,overlayText,primaryText,primaryAction,togglePause,requestRestart,cancelRestart,focusBoard,touchMove,releaseDirection,trapFocus,storageAvailable,completedMaps,levelsOpen,levelPicker,levelTrigger,currentMap,maps,canChooseMap,openLevels,closeLevels,chooseMap,levelKeys};
   }}).mount('#app');
 })();
