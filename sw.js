@@ -1,4 +1,4 @@
-const RELEASE = '1.015';
+const RELEASE = '1.016';
 const SHELL = [
   "./",
   "assets/auto-native.js",
