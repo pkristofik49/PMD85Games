@@ -62,3 +62,6 @@ body.pampuch-expanded{overflow:hidden}
 .direction-pad.manic-pad .left{grid-column:1;grid-row:1}
 .direction-pad.manic-pad .right{grid-column:2;grid-row:1}
 .direction-pad.manic-pad .action{grid-column:3;grid-row:1;margin-left:0}
+
+/* Original Cihly board thumbnail; steering uses the existing two-button pad. */
+.cihly-art img{image-rendering:pixelated;object-fit:contain;background:#000}

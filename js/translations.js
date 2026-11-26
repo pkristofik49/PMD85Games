@@ -1,5 +1,17 @@
 globalThis.PmdTranslations = {
   cs: {
+    cihly:"Odrazte míček a rozbijte cihlovou zeď. Původní vozík, tři míčky a správně načasované odrazy.",
+    cihlyReady:"Cihly",
+    cihlyReadyText:"Tři míčky a cihlová zeď. Šipkami vlevo a vpravo nastavte vozík pod padající míček.",
+    cihlyOverText:"Míčky došly. Zkusíte další hru? Původní rekord zůstane zachovaný.",
+    cihlyPausedText:"Míček na vás počká.",
+    cihlyBoard:"Cihly pro PMD 85. Šipky vlevo/vpravo nebo A/D: pohyb vozíku.",
+    cihlyHud:"Skóre, rekord a zásobu míčků zobrazuje původní herní plocha.",
+    cihlyGuideTitle:"Udržte míček ve hře.",
+    cihlyGuide:"Posouvejte vozík pod padajícím míčkem a odrážejte ho zpět do cihel. Podle místa zásahu vozíku se mění směr odrazu.",
+    cihlyGuide2:"Začínáte se třemi míčky. Zásahy cihel přidávají body. Na konci kola proběhne původní závěrečná animace a následuje další zeď.",
+    cihlyControls:"← / → nebo A / D: pohyb vozíku · P / Esc: pauza · Enter: pokračování · N: nová hra · H: nápověda · F: zvětšení · Z: zvuk",
+    cihlyPrecise:"Na telefonu držte jedno ze dvou směrových tlačítek. Pohyb míčku, odrazy, kolize i zvuky řídí původní PMD program.",
     manic:"Proveďte Willyho dvaceti původními šachtami. Sbírejte předměty, přeskakujte nástrahy a hlídejte kyslík.",
     platformer:"PLOŠINOVÁ HRA",
     manicReady:"Manic Miner",
@@ -56,7 +68,7 @@ globalThis.PmdTranslations = {
     boulderControls:"Šipky / WASD: směr · Mezerník / Shift: akce · P / Esc: pauza · Enter: pokračování · N: nová hra · H: nápověda · F: zvětšení · Z: zvuk",
     boulderPrecise:"Pohyb i akce odpovídají původním klávesám E, Y, ←, → a Shift. Na telefonu použijte směrový kříž a kulaté tlačítko akce.",
     title:'Hry, které pamatují.',subtitle:'Znovu na vaší obrazovce.',intro:'Malá sbírka velkých vzpomínek. Hry z PMD 85 v prohlížeči.',
-    collection:'Vyberte si hru',count:'06 / SBÍRKA',eyebrow:'ČESKOSLOVENSKÉ OSMIBITOVÉ HRY',
+    collection:'Vyberte si hru',count:'07 / SBÍRKA',eyebrow:'ČESKOSLOVENSKÉ OSMIBITOVÉ HRY',
     flappy:'Dostaňte krystal na své místo. Dvě stě původních místností, kameny, houby a trocha přemýšlení.',
     pampuch:'Posbírejte kroužky a utečte duchům. Původních jedenáct bludišť a každý život se počítá.',
     puzzle:'LOGICKÁ HRA',arcade:'ARKÁDA',play:'Hrát',home:'Sbírka her',back:'Zpět do sbírky',
@@ -79,9 +91,21 @@ globalThis.PmdTranslations = {
     flappyFrame:'Flappy – původních 200 místností',flappyNote:'Flappy má vlastní nastavení jazyka, zvuku a grafiky přímo v herním okně.',
     fileNote:'Flappy používá JavaScriptové moduly. Spusťte aplikaci přes místní HTTP server podle README.',
     sources:'Podklady a věrnost originálu',unknown:'Tato hra tu zatím není.',return:'Zpět na výběr her',
-    description:'Reimplementace her PMD 85: Flappy, Pampúch & Duch, Boulder Dash, Auto, Žáby a Manic Miner. Vue, původní pixely a žádné další herní knihovny.'
+    description:'Reimplementace her PMD 85: Flappy, Pampúch & Duch, Boulder Dash, Auto, Žáby, Manic Miner a Cihly. Vue, původní pixely a žádné další herní knihovny.'
   },
   en: {
+    cihly:"Bounce the ball and break the brick wall. The original paddle, three balls and carefully timed rebounds.",
+    cihlyReady:"Bricks",
+    cihlyReadyText:"Three balls and a brick wall. Use left and right to place the paddle beneath the falling ball.",
+    cihlyOverText:"You have run out of balls. Try another game? The native high score will be kept.",
+    cihlyPausedText:"The ball can wait.",
+    cihlyBoard:"Bricks for PMD 85. Left/right arrows or A/D: move the paddle.",
+    cihlyHud:"The original screen displays score, high score and remaining balls.",
+    cihlyGuideTitle:"Keep the ball in play.",
+    cihlyGuide:"Move the paddle beneath the falling ball to bounce it towards the bricks. The hit position on the paddle determines the rebound direction.",
+    cihlyGuide2:"Start with three balls. Hitting bricks adds points. Each completed round triggers the original completion animation before the next wall.",
+    cihlyControls:"← / → or A / D: move paddle · P / Esc: pause · Enter: continue · N: new game · H: help · F: expand · Z: sound",
+    cihlyPrecise:"On a phone, hold either direction button. The original PMD program controls the ball, rebounds, collisions and sound.",
     manic:"Guide Willy through twenty original caverns. Collect the items, jump over hazards and watch your oxygen.",
     platformer:"PLATFORMER",
     manicReady:"Manic Miner",
@@ -138,7 +162,7 @@ globalThis.PmdTranslations = {
     boulderControls:"Arrows / WASD: direction · Space / Shift: action · P / Esc: pause · Enter: continue · N: new game · H: help · F: expand · Z: sound",
     boulderPrecise:"Movement and action map to the original E, Y, ←, → and Shift keys. On a phone, use the direction pad and round action button.",
     title:'Games that remember.',subtitle:'Back on your screen.',intro:'A small collection of great memories. PMD 85 games in your browser.',
-    collection:'Choose your game',count:'06 / COLLECTION',eyebrow:'CZECHOSLOVAK EIGHT-BIT GAMES',
+    collection:'Choose your game',count:'07 / COLLECTION',eyebrow:'CZECHOSLOVAK EIGHT-BIT GAMES',
     flappy:'Guide the crystal home. Two hundred original rooms, rocks, mushrooms and a little thinking.',
     pampuch:'Collect the rings and escape the ghosts. Eleven original mazes, where every life counts.',
     puzzle:'PUZZLE',arcade:'ARCADE',play:'Play',home:'Game collection',back:'Back to collection',
@@ -160,6 +184,6 @@ globalThis.PmdTranslations = {
     flappyFrame:'Flappy – 200 original rooms',flappyNote:'Flappy has its own language, sound and graphics settings inside the game window.',
     fileNote:'Flappy uses JavaScript modules. Serve the application over HTTP as described in the README.',
     sources:'Sources and fidelity',unknown:'This game is not here yet.',return:'Return to game selection',
-    description:'PMD 85 game reimplementations: Flappy, Pampúch & Duch, Boulder Dash, Auto, Frogs and Manic Miner. Vue, original pixels and no extra game libraries.'
+    description:'PMD 85 game reimplementations: Flappy, Pampúch & Duch, Boulder Dash, Auto, Frogs, Manic Miner and Bricks. Vue, original pixels and no extra game libraries.'
   }
 };

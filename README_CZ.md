@@ -5,6 +5,7 @@
 Vue sbírka reimplementací her z PMD 85. První karta: **Flappy**.
 Druhá karta: **Pampúch & Duch**. Třetí karta: **Boulder Dash**. Čtvrtá karta: **Auto**.
 Pátá karta: **Žáby / Frogs**. Šestá karta: **Manic Miner**.
+Sedmá karta: **Cihly / Bricks**.
 Struktura a pravidla vývoje vycházejí ze
 [SMG](https://github.com/pkristofik49/SMG): lokální Vue 3.5.45, statické HTML/CSS/JS,
 nativní API prohlížeče, žádná další běhová knihovna ani instalace npm balíčků.
@@ -20,7 +21,7 @@ node tools/serve.mjs
 
 Otevřete **http://127.0.0.1:4173/PMD85Games/**. Cesty podporují i kořen serveru
 a GitHub Pages pod `/PMD85Games/`. Přímé otevření přes `file://` podporuje menu
-a Pampucha, Boulder Dash, Auto, Žáby i Manic Miner; ES moduly Flappyho a offline podpora vyžadují HTTP/HTTPS.
+a Pampucha, Boulder Dash, Auto, Žáby, Manic Miner i Cihly; ES moduly Flappyho a offline podpora vyžadují HTTP/HTTPS.
 
 ## Hry a ovládání
 
@@ -76,7 +77,16 @@ a Pampucha, Boulder Dash, Auto, Žáby i Manic Miner; ES moduly Flappyho a offli
   původní PIO výstupy. Ukládání používá `pmd85games.manic.v1`: úvod se obnoví
   v uložené pozici, rozehraná hra pozastavená. Zadávání jména do původní tabulky
   rekordů nahrazuje webový konec hry. Karta používá původní úvodní obrazovku;
-  nepřibyla knihovna. Všech šest her je dostupných offline.
+  nepřibyla knihovna. Všech sedm her je dostupných offline.
+- `#/cihly`: **Cihly / Bricks (ZED, R. D.)**, převzaté bajt po bajtu z původní
+  pásky. PMD program řídí vozík, míček, odrazy, mazání cihel, body, tři míčky,
+  závěrečnou animaci i zvuky. Pohyb: ←/→ nebo A/D; na telefonu jsou dvě směrová
+  tlačítka. P/Escape, Enter, N, H, F a Z fungují jako u Pampucha. Skóre, rekord
+  a zásoba míčků se zobrazují v původní ploše. Nová hra využívá původní
+  restartovací vstup a zachová či aktualizuje nativní rekord. Samostatné ukládání
+  celého stroje používá `pmd85games.cihly.v1`; rozehraná hra se obnoví pozastavená.
+  Karta ukazuje původní plochu, protože hra nemá samostatnou úvodní obrazovku.
+  Nepřibyla knihovna; rok vydání není doložen.
 
 Podklady lze znovu importovat bez závislostí příkazem
 `node tools/import-boulder.mjs cesta/ke/games-vbg.ptp`; viz [SOURCES.md](SOURCES.md).
@@ -86,6 +96,8 @@ Podklady Žab vytvoří `node tools/import-zaby.mjs cesta/ke/games-other.mrm`
 ze stejného archivu. Důvod použití funkční MRM verze je v SOURCES.md.
 Podklady Manic Minera vytvoří `node tools/import-manic.mjs cesta/ke/games-2.ptp`
 ze stejného archivu; při importu se spustí původní kazetový zavaděč.
+Podklady Cihel vytvoří `node tools/import-cihly.mjs cesta/ke/games-1.ptp`.
+Kazetový název ZED a srovnání s komentovaným výpisem Cihel popisuje SOURCES.md.
 
 Šipky/WASD mění směr průběžného pohybu. Předčasné zatočení zastaví postavu
 u zdi. Na dotykových zařízeních jsou směrová tlačítka. P/Escape pozastaví,

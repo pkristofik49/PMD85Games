@@ -5,6 +5,7 @@
 A Vue collection of PMD 85 game reimplementations. First card: **Flappy**.
 Second card: **Pampúch & Duch**. Third card: **Boulder Dash**. Fourth card: **Auto**.
 Fifth card: **Žáby / Frogs**. Sixth card: **Manic Miner**.
+Seventh card: **Cihly / Bricks**.
 Structure and development rules follow
 [SMG](https://github.com/pkristofik49/SMG): local Vue 3.5.45, static HTML/CSS/JS,
 native browser APIs, no other runtime library or npm installation.
@@ -20,7 +21,7 @@ node tools/serve.mjs
 
 Open **http://127.0.0.1:4173/PMD85Games/**. Paths also support a server root and
 GitHub Pages under `/PMD85Games/`. Direct `file://` opening supports the menu and
-Pampuch, Boulder Dash, Auto, Frogs and Manic Miner; Flappy's ES modules and offline support require HTTP/HTTPS.
+Pampuch, Boulder Dash, Auto, Frogs, Manic Miner and Bricks; Flappy's ES modules and offline support require HTTP/HTTPS.
 
 ## Games and controls
 
@@ -41,7 +42,7 @@ Pampuch, Boulder Dash, Auto, Frogs and Manic Miner; Flappy's ES modules and offl
   include a round action button. The original E/Y/left/right/Shift matrix is
   mapped without modifying the game program. P/Escape, N, H, F and Z work as in
   Pampuch. Saves use the separate `pmd85games.boulder.v1` key with complete CPU,
-  RAM and sound phase; reloading restores paused. All six games work offline
+  RAM and sound phase; reloading restores paused. All seven games work offline
   after the updated service worker has installed successfully.
 - `#/auto`: **AUTO by R. D.**, the original PMD program from `games-1.ptp`.
   Drive five laps along the original winding road with as few crashes as possible.
@@ -74,6 +75,15 @@ Pampuch, Boulder Dash, Auto, Frogs and Manic Miner; Flappy's ES modules and offl
   Saves use `pmd85games.manic.v1`: the title resumes at its saved position;
   active play restores paused. The web game-over overlay replaces native
   high-score name entry. The card uses the original title, and no library is added.
+- `#/cihly`: **Cihly / Bricks (ZED, R. D.)**, imported byte for byte from the
+  original tape. The PMD program controls the paddle, ball, rebounds, brick
+  erasure, points, three balls, completion animation and sounds. Use left/right
+  arrows or A/D; phones have two steering buttons. P/Escape, Enter, N, H, F and
+  Z work as in Pampuch. The native screen shows score, high score and ball stock.
+  New game runs the original restart entry, preserving and updating the native
+  record. A separate full-machine save uses `pmd85games.cihly.v1`; active games
+  restore paused. The card shows the native board because this game has no
+  separate title screen. No library is added; its publication year is unknown.
 
 Reproduce Boulder assets without dependencies using
 `node tools/import-boulder.mjs path/to/games-vbg.ptp`; see [SOURCES.md](SOURCES.md).
@@ -83,6 +93,8 @@ Frogs assets use `node tools/import-zaby.mjs path/to/games-other.mrm` from the
 same archive. See SOURCES.md for why the working MRM edition is used.
 Manic Miner assets use `node tools/import-manic.mjs path/to/games-2.ptp` from
 the same archive, executing its original tape loader during import.
+Bricks assets use `node tools/import-cihly.mjs path/to/games-1.ptp`; its ZED
+tape name and comparison with the annotated Cihly listing are documented in SOURCES.md.
 
 Arrows/WASD change the continuing movement direction. Turning too early stops
 against a wall. Touch devices provide direction buttons. P/Escape pauses,

@@ -34,11 +34,12 @@
     const storedBest=Number(read('pampuch.best','0'));const best=ref(Number.isSafeInteger(storedBest)&&storedBest>=0?storedBest:0);
     const version=ArcadeVersion,commit=ref(''),isFile=location.protocol==='file:',year=new Date().getFullYear();
     let game;try{game=Pampuch.restore(JSON.parse(read('pampuch.v2','null')));}catch{}game??=new Pampuch();
-    const sessions={pampuch:game},gameTypes={pampuch:Pampuch,boulder:Boulder,auto:AutoGame,zaby:ZabyGame,manic:ManicGame};let gameId='pampuch';
+    const sessions={pampuch:game},gameTypes={pampuch:Pampuch,boulder:Boulder,auto:AutoGame,zaby:ZabyGame,manic:ManicGame,cihly:CihlyGame};let gameId='pampuch';
     const isBoulder=computed(()=>page.value==='boulder');
     const isAuto=computed(()=>page.value==='auto'),isPampuch=computed(()=>page.value==='pampuch');
     const isZaby=computed(()=>page.value==='zaby');
     const isManic=computed(()=>page.value==='manic');
+    const isCihly=computed(()=>page.value==='cihly');
     const isNativePage=()=>Object.hasOwn(gameTypes,page.value);
     let savedCompleted;try{savedCompleted=JSON.parse(read('pampuch.completed','[]'));}catch{}
     const completedMaps=ref(Array.isArray(savedCompleted)?[...new Set(savedCompleted.filter(n=>Number.isInteger(n)&&n>=1&&n<=11))].sort((a,b)=>a-b):[]);
@@ -52,9 +53,9 @@
     const overlayKey=computed(()=>confirmRestart.value?'confirm':({ready:'ready',paused:'paused',dead:'dead',over:'over',level:'level'}[status.value]??'ready'));
     const gameText=(suffix,fallback)=>t(isPampuch.value?fallback:page.value+suffix);
     const overlayTitle=computed(()=>!confirmRestart.value&&status.value==='ready'?gameText('Ready','ready'):isAuto.value&&!confirmRestart.value&&status.value==='over'?t('autoFinished'):t(overlayKey.value));
-    const overlayText=computed(()=>((isAuto.value||isZaby.value||isManic.value)&&!confirmRestart.value&&status.value==='paused'?gameText('PausedText',''):!isPampuch.value&&!confirmRestart.value&&['ready','over'].includes(status.value)?gameText((status.value==='ready'?'Ready':'Over')+'Text',''):t(overlayKey.value+'Text')).replace('{crashes}',String(score.value)));
+    const overlayText=computed(()=>((isAuto.value||isZaby.value||isManic.value||isCihly.value)&&!confirmRestart.value&&status.value==='paused'?gameText('PausedText',''):!isPampuch.value&&!confirmRestart.value&&['ready','over'].includes(status.value)?gameText((status.value==='ready'?'Ready':'Over')+'Text',''):t(overlayKey.value+'Text')).replace('{crashes}',String(score.value)));
     const primaryText=computed(()=>t(confirmRestart.value?'new':status.value==='ready'?'start':status.value==='over'?'new':status.value==='level'?'next':'resume'));
-    const touchDirections=computed(()=>isZaby.value?[{name:'newFrog',symbol:'↻'},{name:'up',symbol:'↑'}]:[{name:'up',symbol:'↑'},{name:'left',symbol:'←'},{name:'down',symbol:'↓'},{name:'right',symbol:'→'}].filter(d=>!(isAuto.value||isManic.value)||['left','right'].includes(d.name)));
+    const touchDirections=computed(()=>isZaby.value?[{name:'newFrog',symbol:'↻'},{name:'up',symbol:'↑'}]:[{name:'up',symbol:'↑'},{name:'left',symbol:'←'},{name:'down',symbol:'↓'},{name:'right',symbol:'→'}].filter(d=>!(isAuto.value||isManic.value||isCihly.value)||['left','right'].includes(d.name)));
     const saveKey=id=>id==='pampuch'?'pampuch.v2':id+'.v1';
     function save(){write(saveKey(gameId),JSON.stringify(game.snapshot()));}
     function paint(){if(board.value)PampuchRender.render(board.value.getContext('2d'),game,best.value);}
@@ -70,7 +71,7 @@
     function focusBoard(event){if(game.state==='playing'){event?.preventDefault();board.value?.focus({preventScroll:true});}}
     function primaryAction(){
       audio.unlock();
-      if(confirmRestart.value||game.state==='over'){game=new gameTypes[gameId]();game.start();confirmRestart.value=false;}
+      if(confirmRestart.value||game.state==='over'){audio.stop();if(typeof game.restart==='function')game.restart();else{game=new gameTypes[gameId]();game.start();}confirmRestart.value=false;}
       else if(game.state==='paused')game.state='playing';
       else if(game.state==='ready'){audio.stop();game.start();}else game.continue();
       last=performance.now();game.release();sync();save();void nextTick(()=>board.value?.focus({preventScroll:true}));
@@ -143,6 +144,6 @@
       if(!isFile)fetch('commit.json',{cache:'no-cache'}).then(r=>r.json()).then(m=>{if(m.version===version&&/^[a-f0-9]{7,40}$/.test(m.commit))commit.value=m.commit.slice(0,7);}).catch(()=>{});
     });
     onUnmounted(()=>{cancelAnimationFrame(frameId);audio.stop();document.body.classList.remove('pampuch-expanded');window.removeEventListener('resize',sizeExpanded);window.visualViewport?.removeEventListener('resize',sizeExpanded);window.removeEventListener('hashchange',route);window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);window.removeEventListener('pagehide',save);document.removeEventListener('visibilitychange',visibility);});
-    return{t,gameText,language,palette,palettes,sound,toggleSound,unlockAudio,page,isBoulder,isAuto,isPampuch,isZaby,isManic,board,primary,flappy,expanded,expandedWidth,globalControlsWidth,landscapeControls,showHelp,confirmRestart,status,score,best,level,lives,remaining,announcement,version,commit,isFile,year,touchDirections,overlayTitle,overlayText,primaryText,primaryAction,togglePause,requestRestart,cancelRestart,focusBoard,touchMove,releaseDirection,trapFocus,storageAvailable,completedMaps,levelsOpen,levelPicker,levelTrigger,currentMap,maps,canChooseMap,openLevels,closeLevels,chooseMap,levelKeys};
+    return{t,gameText,language,palette,palettes,sound,toggleSound,unlockAudio,page,isBoulder,isAuto,isPampuch,isZaby,isManic,isCihly,board,primary,flappy,expanded,expandedWidth,globalControlsWidth,landscapeControls,showHelp,confirmRestart,status,score,best,level,lives,remaining,announcement,version,commit,isFile,year,touchDirections,overlayTitle,overlayText,primaryText,primaryAction,togglePause,requestRestart,cancelRestart,focusBoard,touchMove,releaseDirection,trapFocus,storageAvailable,completedMaps,levelsOpen,levelPicker,levelTrigger,currentMap,maps,canChooseMap,openLevels,closeLevels,chooseMap,levelKeys};
   }}).mount('#app');
 })();

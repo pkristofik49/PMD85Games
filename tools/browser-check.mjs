@@ -25,7 +25,7 @@ try{
  await call('Storage.clearDataForOrigin',{origin:new URL(base).origin,storageTypes:'all'});
  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
  await call('Page.navigate',{url:base});
- await until(`document.querySelectorAll('.game-card').length===6 && !document.querySelector('#app').hasAttribute('v-cloak')`);
+ await until(`document.querySelectorAll('.game-card').length===7 && !document.querySelector('#app').hasAttribute('v-cloak')`);
  await screenshot('menu-desktop.png');
  assert.equal(await evaluate(`document.querySelector('.game-card').dataset.game`),'flappy');
  await until(`document.querySelector('[data-game="pampuch"] img')?.naturalWidth>0`);
@@ -113,7 +113,7 @@ try{
  await evaluate(`document.querySelector('.level-trigger').click()`);await until(`document.querySelector('#pampuch-levels')`);
  assert.equal(await evaluate(`document.querySelector('[data-map="3"]').disabled`),true);
  await press('Escape','Escape');await until(`!document.querySelector('#pampuch-levels')`);
- await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===6`);
+ await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===7`);
  assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);await screenshot('menu-mobile.png');
  await evaluate(`document.querySelector('[data-game="flappy"]').click()`);
  await until(`document.querySelector('iframe')?.contentDocument.querySelector('.title-screen img')?.naturalWidth>0`);
@@ -205,7 +205,7 @@ try{
  await until(`document.querySelector('.application').classList.contains('landscape-controls')`);await delay(150);
  assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
  await screenshot('zaby-landscape.png');await press('KeyF','f');
- await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===6`);
+ await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===7`);
  const buffersBefore=await evaluate(`window.__pmdBuffers.length`);
  await evaluate(`document.querySelector('[data-game="manic"]').click()`);await until(`document.querySelector('canvas[data-state="ready"]')`);
  assert.equal(await evaluate(`document.querySelector('#game-title').textContent`),'Manic Miner');
@@ -235,20 +235,54 @@ try{
  await until(`document.querySelector('.application').classList.contains('landscape-controls')`);await delay(150);
  assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
  await screenshot('manic-landscape.png');await press('KeyF','f');
- // The root service worker must cache all six games, including the embedded module graph.
+ await evaluate(`location.hash='#/cihly'`);await until(`document.querySelector('canvas[data-state="ready"]')`);
+ assert.equal(await evaluate(`document.querySelector('#game-title').textContent`),'Bricks');
+ assert.equal(await evaluate(`!!document.querySelector('.level-trigger')`),false);
+ await evaluate(`document.querySelector('.primary-button').click()`);
+ await call('Input.dispatchKeyEvent',{type:'keyDown',code:'ArrowLeft',key:'ArrowLeft'});await delay(350);
+ await call('Input.dispatchKeyEvent',{type:'keyUp',code:'ArrowLeft',key:'ArrowLeft'});await press('KeyP','p');
+ await until(`document.querySelector('canvas[data-state="paused"]')`);
+ const cihlySave=await evaluate(`JSON.parse(localStorage.getItem('pmd85games.cihly.v1'))`);
+ assert.equal(cihlySave.game,'cihly');assert.ok(cihlySave.machine.ram[0x12a6]<22,'Left key steers the native paddle');
+ assert.equal(await evaluate(`JSON.parse(localStorage.getItem('pmd85games.manic.v1')).machine.cpu.cycles`),manicSave.machine.cpu.cycles);
+ await call('Page.reload');await until(`document.querySelector('canvas[data-state="paused"]')`);
+ assert.deepEqual(await evaluate(`JSON.parse(localStorage.getItem('pmd85games.cihly.v1')).machine.cpu`),cihlySave.machine.cpu);
+ await press('KeyN','n');await until(`document.querySelector('.secondary-button')`);await press('Enter','Enter');
+ await until(`document.querySelector('canvas[data-state="playing"]')`);await delay(5200);await press('KeyP','p');
+ await until(`document.querySelector('canvas[data-state="paused"]')`);
+ const earned=await evaluate(`Number(String.fromCharCode(...JSON.parse(localStorage.getItem('pmd85games.cihly.v1')).machine.ram.slice(0x132c,0x1330)))`);
+ assert.ok(earned>9,'Real native play earns a score before restarting');
+ await press('KeyN','n');await until(`document.querySelector('.secondary-button')`);await press('Enter','Enter');
+ await until(`document.querySelector('canvas[data-state="playing"]')`);await press('KeyP','p');
+ await until(`document.querySelector('canvas[data-state="paused"]')`);
+ assert.equal(await evaluate(`Number(String.fromCharCode(...JSON.parse(localStorage.getItem('pmd85games.cihly.v1')).machine.ram.slice(0x133e,0x1342)))`),earned,'New game retains the native high score');
+ await call('Page.reload');await until(`document.querySelector('canvas[data-state="paused"]')`);
+ assert.equal(await evaluate(`Number(String.fromCharCode(...JSON.parse(localStorage.getItem('pmd85games.cihly.v1')).machine.ram.slice(0x133e,0x1342)))`),earned);
+ assert.equal(await evaluate(`document.querySelector('.board-overlay p').textContent`),'The ball can wait.');
+ await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
+ await screenshot('cihly-desktop.png');
+ await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+ assert.equal(await evaluate(`document.querySelectorAll('.direction-pad button').length`),2);
+ assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);await screenshot('cihly-mobile.png');
+ await press('KeyF','f');await call('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:1,mobile:true});
+ await until(`document.querySelector('.application').classList.contains('landscape-controls')`);await delay(150);
+ assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
+ await screenshot('cihly-landscape.png');await press('KeyF','f');
+ // The root service worker must cache all seven games, including the embedded module graph.
  await until(`navigator.serviceWorker.getRegistration().then(r=>!!r?.active)`);
  await call('Page.reload');await until(`navigator.serviceWorker.controller!==null`);
  await call('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
- await evaluate(`location.hash='#/'`);await call('Page.reload');await until(`document.querySelectorAll('.game-card').length===6`);
+ await evaluate(`location.hash='#/'`);await call('Page.reload');await until(`document.querySelectorAll('.game-card').length===7`);
  await evaluate(`location.hash='#/flappy'`);await until(`document.querySelector('iframe')?.contentDocument.querySelector('.title-screen img')?.naturalWidth>0`);
  await evaluate(`location.hash='#/pampuch'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  await evaluate(`location.hash='#/boulder'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  await evaluate(`location.hash='#/auto'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  await evaluate(`location.hash='#/zaby'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  await evaluate(`location.hash='#/manic'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
+ await evaluate(`location.hash='#/cihly'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  assert.equal(errors.length,0,errors.join('\n'));
  await call('Page.removeScriptToEvaluateOnNewDocument',{identifier:instrumentation.identifier});
- console.log('Browser checks passed: desktop, mobile, gameplay, pause, reload, translations, palettes and all six games offline.');
+ console.log('Browser checks passed: desktop, mobile, gameplay, pause, reload, translations, palettes and all seven games offline.');
 }finally{
  await call('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});ws.close();
 }
