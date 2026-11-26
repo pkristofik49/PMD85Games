@@ -25,7 +25,7 @@ try{
  await call('Storage.clearDataForOrigin',{origin:new URL(base).origin,storageTypes:'all'});
  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
  await call('Page.navigate',{url:base});
- await until(`document.querySelectorAll('.game-card').length===9 && !document.querySelector('#app').hasAttribute('v-cloak')`);
+ await until(`document.querySelectorAll('.game-card').length===10 && !document.querySelector('#app').hasAttribute('v-cloak')`);
  await screenshot('menu-desktop.png');
  assert.equal(await evaluate(`document.querySelector('.game-card').dataset.game`),'flappy');
  await until(`document.querySelector('[data-game="pampuch"] img')?.naturalWidth>0`);
@@ -113,7 +113,7 @@ try{
  await evaluate(`document.querySelector('.level-trigger').click()`);await until(`document.querySelector('#pampuch-levels')`);
  assert.equal(await evaluate(`document.querySelector('[data-map="3"]').disabled`),true);
  await press('Escape','Escape');await until(`!document.querySelector('#pampuch-levels')`);
- await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===9`);
+ await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===10`);
  assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);await screenshot('menu-mobile.png');
  await evaluate(`document.querySelector('[data-game="flappy"]').click()`);
  await until(`document.querySelector('iframe')?.contentDocument.querySelector('.title-screen img')?.naturalWidth>0`);
@@ -205,7 +205,7 @@ try{
  await until(`document.querySelector('.application').classList.contains('landscape-controls')`);await delay(150);
  assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
  await screenshot('zaby-landscape.png');await press('KeyF','f');
- await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===9`);
+ await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===10`);
  const buffersBefore=await evaluate(`window.__pmdBuffers.length`);
  await evaluate(`document.querySelector('[data-game="manic"]').click()`);await until(`document.querySelector('canvas[data-state="ready"]')`);
  assert.equal(await evaluate(`document.querySelector('#game-title').textContent`),'Manic Miner');
@@ -269,7 +269,7 @@ try{
  assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
  await screenshot('cihly-landscape.png');await press('KeyF','f');
  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
- await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===9`);
+ await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===10`);
  const beforeManic2=await evaluate(`window.__pmdBuffers.length`);
  await evaluate(`document.querySelector('[data-game="manic2"]').click()`);await until(`document.querySelector('canvas[data-state="ready"]')`);
  assert.equal(await evaluate(`document.querySelector('#game-title').textContent`),'MANIC2+3');
@@ -306,7 +306,7 @@ try{
  assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
  await screenshot('manic2-landscape.png');await press('KeyF','f');
  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
- await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===9`);
+ await evaluate(`location.hash='#/'`);await until(`document.querySelectorAll('.game-card').length===10`);
  const beforeSaboter=await evaluate(`window.__pmdBuffers.length`);
  await evaluate(`document.querySelector('[data-game="saboter"]').click()`);await until(`document.querySelector('canvas[data-state="ready"]')`);
  assert.equal(await evaluate(`document.querySelector('#game-title').textContent`),'Saboteur');
@@ -334,11 +334,44 @@ try{
  await until(`document.querySelector('.application').classList.contains('landscape-controls')`);await delay(150);
  assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
  await screenshot('saboter-landscape.png');await press('KeyF','f');
- // The root service worker must cache all nine games, including the embedded module graph.
+ await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1080,deviceScaleFactor:1,mobile:false});
+ await evaluate(`location.hash='#/invaders'`);await until(`document.querySelector('canvas[data-state="ready"]')`);
+ assert.equal(await evaluate(`document.querySelector('#game-title').textContent`),'Invaders');assert.equal(await evaluate(`document.querySelectorAll('.invaders-difficulty option').length`),5);
+ await evaluate(`{const select=document.querySelector('.invaders-difficulty');select.value='4';select.dispatchEvent(new Event('change',{bubbles:true}));}`);
+ await until(`JSON.parse(localStorage.getItem('pmd85games.invaders.v1'))?.difficulty===4`);
+ await call('Page.reload');await until(`document.querySelector('.invaders-difficulty')?.value==='4'`);await screenshot('invaders-title.png');
+ await evaluate(`document.querySelector('.primary-button').click()`);
+ await call('Input.dispatchKeyEvent',{type:'keyDown',code:'ArrowLeft',key:'ArrowLeft'});await delay(350);
+ await call('Input.dispatchKeyEvent',{type:'keyUp',code:'ArrowLeft',key:'ArrowLeft'});
+ await call('Input.dispatchKeyEvent',{type:'keyDown',code:'Space',key:' '});await delay(300);await press('KeyP','p');
+ await call('Input.dispatchKeyEvent',{type:'keyUp',code:'Space',key:' '});await until(`document.querySelector('canvas[data-state="paused"]')`);
+ const invadersSave=await evaluate(`JSON.parse(localStorage.getItem('pmd85games.invaders.v1'))`);
+ assert.equal(invadersSave.game,'invaders');assert.equal(invadersSave.difficulty,4);assert.equal(invadersSave.machine.ram[0x03cd],4);assert.ok(invadersSave.machine.ram[0x03b5]<19,'Native left steering');assert.ok(invadersSave.machine.ram[0x03b9]||invadersSave.machine.ram[0x03ba],'Native shot is active');
+ const saboterBefore=await evaluate(`localStorage.getItem('pmd85games.saboter.v1')`);
+ await call('Page.reload');await until(`document.querySelector('canvas[data-state="paused"]')`);
+ assert.deepEqual(await evaluate(`JSON.parse(localStorage.getItem('pmd85games.invaders.v1')).machine.cpu`),invadersSave.machine.cpu);assert.equal(await evaluate(`localStorage.getItem('pmd85games.saboter.v1')`),saboterBefore);
+ await press('KeyN','n');await until(`document.querySelector('.invaders-difficulty')`);
+ await evaluate(`{const select=document.querySelector('.invaders-difficulty');select.value='1';select.dispatchEvent(new Event('change',{bubbles:true}));document.querySelector('.secondary-button').click();}`);
+ assert.equal(await evaluate(`JSON.parse(localStorage.getItem('pmd85games.invaders.v1')).difficulty`),4,'Cancelled difficulty remains unchanged');
+ await press('KeyN','n');await until(`document.querySelector('.invaders-difficulty')`);assert.equal(await evaluate(`document.querySelector('.invaders-difficulty').value`),'4');
+ await evaluate(`{const select=document.querySelector('.invaders-difficulty');select.value='2';select.dispatchEvent(new Event('change',{bubbles:true}));document.querySelector('.primary-button').click();}`);
+ await until(`document.querySelector('canvas[data-state="playing"]')`);await press('KeyP','p');await until(`document.querySelector('canvas[data-state="paused"]')`);
+ assert.equal(await evaluate(`JSON.parse(localStorage.getItem('pmd85games.invaders.v1')).machine.ram[0x03cd]`),2);await screenshot('invaders-desktop.png');
+ await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+ assert.equal(await evaluate(`document.querySelectorAll('.direction-pad button').length`),3);assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);await screenshot('invaders-mobile.png');
+ await press('KeyN','n');await until(`document.querySelector('.invaders-difficulty')`);
+ await call('Emulation.setDeviceMetricsOverride',{width:320,height:740,deviceScaleFactor:1,mobile:true});await delay(150);
+ assert.equal(await evaluate(`(()=>{const area=document.querySelector('.screen').getBoundingClientRect();return [...document.querySelectorAll('.board-overlay button,.board-overlay select')].every(el=>{const r=el.getBoundingClientRect();return r.top>=area.top&&r.bottom<=area.bottom;});})()`),true,'Difficulty confirmation fits a narrow phone');
+ await screenshot('invaders-mode-mobile.png');await evaluate(`document.querySelector('.secondary-button').click()`);
+ await press('KeyF','f');await call('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:1,mobile:true});
+ await until(`document.querySelector('.application').classList.contains('landscape-controls')`);await delay(150);
+ assert.ok(await evaluate(`document.querySelector('canvas').getBoundingClientRect().left>=document.querySelector('.direction-pad').getBoundingClientRect().right`));
+ await screenshot('invaders-landscape.png');await press('KeyF','f');
+ // The root service worker must cache all ten games, including the embedded module graph.
  await until(`navigator.serviceWorker.getRegistration().then(r=>!!r?.active)`);
  await call('Page.reload');await until(`navigator.serviceWorker.controller!==null`);
  await call('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
- await evaluate(`location.hash='#/'`);await call('Page.reload');await until(`document.querySelectorAll('.game-card').length===9`);
+ await evaluate(`location.hash='#/'`);await call('Page.reload');await until(`document.querySelectorAll('.game-card').length===10`);
  await evaluate(`location.hash='#/flappy'`);await until(`document.querySelector('iframe')?.contentDocument.querySelector('.title-screen img')?.naturalWidth>0`);
  await evaluate(`location.hash='#/pampuch'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  await evaluate(`location.hash='#/boulder'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
@@ -348,9 +381,10 @@ try{
  await evaluate(`location.hash='#/cihly'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  await evaluate(`location.hash='#/manic2'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  await evaluate(`location.hash='#/saboter'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
+ await evaluate(`location.hash='#/invaders'`);await until(`document.querySelector('canvas[data-state="paused"]')`);
  assert.equal(errors.length,0,errors.join('\n'));
  await call('Page.removeScriptToEvaluateOnNewDocument',{identifier:instrumentation.identifier});
- console.log('Browser checks passed: desktop, mobile, gameplay, pause, reload, translations, palettes and all nine games offline.');
+ console.log('Browser checks passed: desktop, mobile, gameplay, pause, reload, translations, palettes and all ten games offline.');
 }finally{
  await call('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});ws.close();
 }

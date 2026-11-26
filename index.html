@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f3ed">
-  <meta name="description" content="Hry z PMD 85 v prohlížeči: Flappy, Pampúch & Duch, Boulder Dash, Auto, Žáby, Manic Miner, Cihly, MANIC2+3 a Saboter.">
+  <meta name="description" content="Hry z PMD 85 v prohlížeči: Flappy, Pampúch & Duch, Boulder Dash, Auto, Žáby, Manic Miner, Cihly, MANIC2+3, Saboter a Invaders.">
   <title>PMD 85 Games</title>
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
@@ -20,6 +20,7 @@
   <script defer src="assets/cihly-native.js"></script>
   <script defer src="assets/manic2-native.js"></script>
   <script defer src="assets/saboter-native.js"></script>
+  <script defer src="assets/invaders-native.js"></script>
   <script defer src="js/translations.js"></script>
   <script defer src="js/version.js"></script>
   <script defer src="js/pixel-font.js"></script>
@@ -33,13 +34,14 @@
   <script defer src="js/cihly.js"></script>
   <script defer src="js/manic2.js"></script>
   <script defer src="js/saboter.js"></script>
+  <script defer src="js/invaders.js"></script>
   <script defer src="js/pampuch-render.js"></script>
   <script defer src="js/audio.js"></script>
   <script defer src="js/app.js"></script>
   <script defer src="js/pwa.js"></script>
 </head>
 <body>
-  <div id="app" v-cloak><div class="application" :class="{'expanded-mode':expanded && ['pampuch','boulder','auto','zaby','manic','cihly','manic2','saboter'].includes(page),'landscape-controls':landscapeControls}" :style="{'--expanded-machine-width':expandedWidth+'px','--global-controls-width':globalControlsWidth+'px'}">
+  <div id="app" v-cloak><div class="application" :class="{'expanded-mode':expanded && ['pampuch','boulder','auto','zaby','manic','cihly','manic2','saboter','invaders'].includes(page),'landscape-controls':landscapeControls}" :style="{'--expanded-machine-width':expandedWidth+'px','--global-controls-width':globalControlsWidth+'px'}">
     <header class="site-header">
       <a class="brand" href="#/" :aria-label="t('home')"><img class="brand-mark" src="icons/icon.svg" width="43" height="43" alt=""> PMD 85 <span class="brand-suffix">/ games</span></a>
       <span class="header-note">1986 → {{ year }}</span>
@@ -65,6 +67,7 @@
           <a href="#/cihly" class="game-card" data-game="cihly"><div class="card-art cihly-art"><img src="assets/cihly-screen.png" alt="" loading="eager"><span class="art-label">PMD 85 · R. D.</span></div><div class="card-content"><p class="card-number">07 <span>/ {{ t('arcade') }}</span></p><h3>{{ t('cihlyReady') }}<span class="card-dot">.</span></h3><p>{{ t('cihly') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
           <a href="#/manic2" class="game-card" data-game="manic2" @click="unlockAudio"><div class="card-art manic2-art"><img src="assets/manic2-title.png" alt="" loading="eager"><span class="art-label">PMD 85 · VBG · 1987</span></div><div class="card-content"><p class="card-number">08 <span>/ {{ t('platformer') }}</span></p><h3>MANIC2+3<span class="card-dot">.</span></h3><p>{{ t('manic2') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
           <a href="#/saboter" class="game-card" data-game="saboter" @click="unlockAudio"><div class="card-art saboter-art"><img src="assets/saboter-title.png" alt="" loading="eager"><span class="art-label">PMD 85 · VBG · 1989</span></div><div class="card-content"><p class="card-number">09 <span>/ {{ t('platformer') }}</span></p><h3>{{ t('saboterReady') }}<span class="card-dot">.</span></h3><p>{{ t('saboter') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
+          <a href="#/invaders" class="game-card" data-game="invaders" @click="unlockAudio"><div class="card-art invaders-art"><img src="assets/invaders-title.png" alt="" loading="eager"><span class="art-label">PMD 85 · IFO · 1985</span></div><div class="card-content"><p class="card-number">10 <span>/ {{ t('shooter') }}</span></p><h3>Invaders<span class="card-dot">.</span></h3><p>{{ t('invaders') }}</p><div class="card-bottom"><span>{{ t('play') }}</span><span class="card-arrow" aria-hidden="true">↗</span></div></div></a>
         </div>
       </section>
       <p class="menu-note"><span class="status-dot"></span>{{ t('local') }}</p>
@@ -75,7 +78,7 @@
       <iframe v-else ref="flappy" src="games/flappy/index.html?embedded=1" :title="t('flappyFrame')" allow="fullscreen" class="flappy-frame"></iframe>
       <p class="save-note">{{ t('flappyNote') }}</p>
     </main>
-    <main v-else-if="['pampuch','boulder','auto','zaby','manic','cihly','manic2','saboter'].includes(page)" class="play-page">
+    <main v-else-if="['pampuch','boulder','auto','zaby','manic','cihly','manic2','saboter','invaders'].includes(page)" class="play-page">
       <nav class="game-toolbar"><a href="#/" :aria-label="t('back')"><span aria-hidden="true">←</span> <span class="back-label">{{ t('back') }}</span></a><div class="game-actions">
         <button @click="requestRestart" :disabled="levelsOpen" :title="t('new')+' (N)'" aria-keyshortcuts="N">↻ <span>{{ t('new') }}</span></button>
         <button v-if="isPampuch" ref="levelTrigger" class="level-trigger" @click="openLevels" :disabled="confirmRestart" :aria-label="t('chooseLevel')" :aria-expanded="levelsOpen" aria-controls="pampuch-levels" :title="t('chooseLevel')">▦ <span>{{ t('levelLabel') }}</span></button>
@@ -84,7 +87,7 @@
         <button @click="showHelp=!showHelp" :aria-label="t('help')" :aria-expanded="showHelp" :title="t('help')+' (H)'" aria-keyshortcuts="H">?</button>
       </div></nav>
       <div class="play-layout">
-        <section class="game-column" aria-labelledby="game-title"><div class="game-heading"><div><p class="eyebrow">{{ isSaboter?'09':isManic2?'08':isCihly?'07':isManic?'06':isZaby?'05':isAuto?'04':isBoulder?'03':'02' }} / {{ t(isPlatformer||isSaboter?'platformer':isAuto?'racing':'arcade') }}</p><h1 id="game-title"><template v-if="isSaboter">{{ t('saboterReady') }}</template><template v-else-if="isManic2">MANIC2+3</template><template v-else-if="isCihly">{{ t('cihlyReady') }}</template><template v-else-if="isManic">Manic <span>Miner</span></template><template v-else-if="isZaby">{{ t('zabyReady') }}</template><template v-else-if="isAuto">Auto</template><template v-else-if="isBoulder">Boulder <span>Dash</span></template><template v-else>Pampúch <span>& Duch</span></template></h1></div><div v-if="isPampuch" class="scores"><div><span>{{ t('score') }}</span><strong>{{ score }}</strong></div><div><span>{{ t('best') }}</span><strong>{{ best }}</strong></div></div></div>
+        <section class="game-column" aria-labelledby="game-title"><div class="game-heading"><div><p class="eyebrow">{{ isInvaders?'10':isSaboter?'09':isManic2?'08':isCihly?'07':isManic?'06':isZaby?'05':isAuto?'04':isBoulder?'03':'02' }} / {{ t(isInvaders?'shooter':isPlatformer||isSaboter?'platformer':isAuto?'racing':'arcade') }}</p><h1 id="game-title"><template v-if="isInvaders">Invaders</template><template v-else-if="isSaboter">{{ t('saboterReady') }}</template><template v-else-if="isManic2">MANIC2+3</template><template v-else-if="isCihly">{{ t('cihlyReady') }}</template><template v-else-if="isManic">Manic <span>Miner</span></template><template v-else-if="isZaby">{{ t('zabyReady') }}</template><template v-else-if="isAuto">Auto</template><template v-else-if="isBoulder">Boulder <span>Dash</span></template><template v-else>Pampúch <span>& Duch</span></template></h1></div><div v-if="isPampuch" class="scores"><div><span>{{ t('score') }}</span><strong>{{ score }}</strong></div><div><span>{{ t('best') }}</span><strong>{{ best }}</strong></div></div></div>
           <div class="machine">
             <div class="machine-label"><span><i></i> PMD 85-1</span><span>{{ t('original') }}</span></div>
             <div class="screen"><canvas ref="board" width="288" height="256" tabindex="0" :aria-label="gameText('Board','board')" :data-state="status" @pointerdown="focusBoard"></canvas>
@@ -93,18 +96,19 @@
                 <div class="level-grid"><button v-for="map in maps" :key="map" :data-map="map" :disabled="!canChooseMap(map)" :class="{completed:completedMaps.includes(map),current:currentMap===map}" :aria-label="t('levelLabel')+' '+map+' — '+t(completedMaps.includes(map)?'levelCompleted':canChooseMap(map)?'levelAvailable':'levelLocked')" :aria-current="currentMap===map?'true':undefined" @click="chooseMap(map)">{{ map }}<small aria-hidden="true">{{ completedMaps.includes(map)?'✓':canChooseMap(map)?'':'🔒' }}</small></button></div>
                 <p class="level-note">{{ t('levelReplayNote') }}</p><button class="secondary-button" @click="closeLevels">{{ t('closeLevels') }}</button>
               </div>
-              <div v-else-if="status!=='playing' || confirmRestart" class="board-overlay" :class="{'mode-overlay':isManic2 && (status==='ready' || confirmRestart)}" role="dialog" aria-modal="true" :aria-label="overlayTitle" @keydown.tab="trapFocus">
+              <div v-else-if="status!=='playing' || confirmRestart" class="board-overlay" :class="{'mode-overlay':(isManic2 && (status==='ready' || confirmRestart)) || (isInvaders && (['ready','level'].includes(status) || confirmRestart))}" role="dialog" aria-modal="true" :aria-label="overlayTitle" @keydown.tab="trapFocus">
                 <span class="overlay-mark" aria-hidden="true">{{ status==='over'?'×':['level','won'].includes(status)?'✓':'85' }}</span><h2>{{ overlayTitle }}</h2><p>{{ overlayText }}</p>
                 <select v-if="isManic2 && (status==='ready' || confirmRestart)" class="native-mode" v-model="manic2Mode" :aria-label="t('manic2Mode')"><option value="normal">{{ t('manic2Normal') }}</option><option value="training">{{ t('manic2Training') }}</option></select>
+                <select v-if="isInvaders && (['ready','level'].includes(status) || confirmRestart)" class="native-mode invaders-difficulty" v-model.number="invadersDifficulty" :aria-label="t('invadersDifficulty')"><option v-for="difficulty in [0,1,2,3,4]" :value="difficulty">{{ t('invadersDifficulty'+difficulty) }}</option></select>
                 <button ref="primary" class="primary-button" @click="primaryAction">{{ primaryText }}</button><button v-if="confirmRestart" class="secondary-button" @click="cancelRestart">{{ t('cancel') }}</button>
               </div>
             </div>
-            <div class="machine-bottom"><span>TESLA · PIEŠŤANY</span><span>{{ isSaboter?'VBG SOFTWARE / 1989':isManic2?'VBG SOFTWARE / 1987':isCihly?'CIHLY / R. D.':isManic?'VILISOFT & DAJESOFT / 1985':isZaby?'ZABY / PMD 85':isAuto?'AUTO / R. D.':isBoulder?'VBG SOFTWARE / 1988':'DUŠAN BLAŠKO / 1986' }}</span></div>
+            <div class="machine-bottom"><span>TESLA · PIEŠŤANY</span><span>{{ isInvaders?'IFO SOFTWARE / 1985':isSaboter?'VBG SOFTWARE / 1989':isManic2?'VBG SOFTWARE / 1987':isCihly?'CIHLY / R. D.':isManic?'VILISOFT & DAJESOFT / 1985':isZaby?'ZABY / PMD 85':isAuto?'AUTO / R. D.':isBoulder?'VBG SOFTWARE / 1988':'DUŠAN BLAŠKO / 1986' }}</span></div>
           </div>
           <div v-if="isPampuch" class="below-board"><span>{{ t('levelLabel') }} <strong>{{ level }}</strong></span><span>{{ t('lives') }} <strong>{{ lives }}</strong></span><span>{{ t('rings') }} <strong>{{ remaining }}</strong></span></div>
           <div v-if="isAuto" class="below-board"><span>{{ t('autoCrashes') }} <strong>{{ score }}</strong></span><span>{{ t('autoLaps') }} <strong>{{ remaining }}</strong></span></div>
-          <p v-if="isBoulder||isZaby||isPlatformer||isCihly||isSaboter" class="save-note boulder-hud-note">{{ gameText('Hud','') }}</p>
-          <div class="direction-pad" :class="{'auto-pad':isAuto||isCihly,'zaby-pad':isZaby,'manic-pad':isPlatformer}" role="group" :aria-label="t('controls')"><button v-for="d in touchDirections" :class="d.name" :aria-label="t(isZaby?(d.name==='up'?'zabyJump':'zabyNewFrog'):d.name)" @pointerdown.prevent="touchMove(d.name,$event)" @pointerup="releaseDirection(d.name)" @pointercancel="releaseDirection(d.name)" @lostpointercapture="releaseDirection(d.name)" @contextmenu.prevent>{{ d.symbol }}</button><button v-if="isBoulder||isPlatformer||isSaboter" class="action" :aria-label="gameText('Action','')" @pointerdown.prevent="touchMove('action',$event)" @pointerup="releaseDirection('action')" @pointercancel="releaseDirection('action')" @lostpointercapture="releaseDirection('action')" @contextmenu.prevent>●</button></div>
+          <p v-if="isBoulder||isZaby||isPlatformer||isCihly||isSaboter||isInvaders" class="save-note boulder-hud-note">{{ gameText('Hud','') }}</p>
+          <div class="direction-pad" :class="{'auto-pad':isAuto||isCihly,'zaby-pad':isZaby,'manic-pad':isPlatformer||isInvaders}" role="group" :aria-label="t('controls')"><button v-for="d in touchDirections" :class="d.name" :aria-label="t(isZaby?(d.name==='up'?'zabyJump':'zabyNewFrog'):d.name)" @pointerdown.prevent="touchMove(d.name,$event)" @pointerup="releaseDirection(d.name)" @pointercancel="releaseDirection(d.name)" @lostpointercapture="releaseDirection(d.name)" @contextmenu.prevent>{{ d.symbol }}</button><button v-if="isBoulder||isPlatformer||isSaboter||isInvaders" class="action" :aria-label="gameText('Action','')" @pointerdown.prevent="touchMove('action',$event)" @pointerup="releaseDirection('action')" @pointercancel="releaseDirection('action')" @lostpointercapture="releaseDirection('action')" @contextmenu.prevent>●</button></div>
           <p class="save-note" :class="{'storage-warning':!storageAvailable}">{{ t(storageAvailable?'saved':'notSaved') }}</p>
           <p class="sr-only" role="status" aria-live="polite">{{ announcement }}</p>
         </section>

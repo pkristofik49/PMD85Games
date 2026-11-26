@@ -5,7 +5,7 @@
 Vue sbírka reimplementací her z PMD 85. První karta: **Flappy**.
 Druhá karta: **Pampúch & Duch**. Třetí karta: **Boulder Dash**. Čtvrtá karta: **Auto**.
 Pátá karta: **Žáby / Frogs**. Šestá karta: **Manic Miner**.
-Sedmá karta: **Cihly / Bricks**. Osmá karta: **MANIC2+3**. Devátá karta: **Saboter / Saboteur**.
+Sedmá karta: **Cihly / Bricks**. Osmá karta: **MANIC2+3**. Devátá karta: **Saboter / Saboteur**. Desátá karta: **Invaders**.
 Struktura a pravidla vývoje vycházejí ze
 [SMG](https://github.com/pkristofik49/SMG): lokální Vue 3.5.45, statické HTML/CSS/JS,
 nativní API prohlížeče, žádná další běhová knihovna ani instalace npm balíčků.
@@ -21,7 +21,7 @@ node tools/serve.mjs
 
 Otevřete **http://127.0.0.1:4173/PMD85Games/**. Cesty podporují i kořen serveru
 a GitHub Pages pod `/PMD85Games/`. Přímé otevření přes `file://` podporuje menu
-a Pampucha, Boulder Dash, Auto, Žáby, Manic Miner, Cihly, MANIC2+3 i Saboter; ES moduly Flappyho a offline podpora vyžadují HTTP/HTTPS.
+a Pampucha, Boulder Dash, Auto, Žáby, Manic Miner, Cihly, MANIC2+3, Saboter i Invaders; ES moduly Flappyho a offline podpora vyžadují HTTP/HTTPS.
 
 ## Hry a ovládání
 
@@ -77,7 +77,7 @@ a Pampucha, Boulder Dash, Auto, Žáby, Manic Miner, Cihly, MANIC2+3 i Saboter; 
   původní PIO výstupy. Ukládání používá `pmd85games.manic.v1`: úvod se obnoví
   v uložené pozici, rozehraná hra pozastavená. Zadávání jména do původní tabulky
   rekordů nahrazuje webový konec hry. Karta používá původní úvodní obrazovku;
-  nepřibyla knihovna. Všech devět her je dostupných offline.
+  nepřibyla knihovna. Všech deset her je dostupných offline.
 - `#/cihly`: **Cihly / Bricks (ZED, R. D.)**, převzaté bajt po bajtu z původní
   pásky. PMD program řídí vozík, míček, odrazy, mazání cihel, body, tři míčky,
   závěrečnou animaci i zvuky. Pohyb: ←/→ nebo A/D; na telefonu jsou dvě směrová
@@ -113,6 +113,18 @@ a Pampucha, Boulder Dash, Auto, Žáby, Manic Miner, Cihly, MANIC2+3 i Saboter; 
   neúspěchu. Úplné CPU/RAM ukládání používá `pmd85games.saboter.v1`;
   rozehraná hra se obnoví pozastavená. Nepřibyla knihovna. Podklady obnoví
   `node tools/import-saboter.mjs cesta/ke/games-vbg.ptp`.
+
+- `#/invaders`: **Space Invaders (Ivan Fedorko / IFO Software, 1985)**.
+  Před hrou, další vlnou nebo při potvrzení nové hry vyberte jednu z pěti
+  původních obtížností. Pohyb: ←/→ nebo A/D; střelba: mezerník/Shift.
+  Na telefonu jsou dvě směrová tlačítka a kulatá střelba. Původní kód řídí
+  generování nepřátel, pohyb, jednu aktivní střelu, zásahy, BCD skóre, čas,
+  tři průniky nepřátel, závěrečnou animaci a PIO zvuk. Úvodní obrazovka
+  i herní ukazatele zůstávají zachované. Odražená vlna vrátí původním menu
+  volbu obtížnosti; nová hra zachovává původní rekord. P/Escape, Enter, N, H,
+  F a Z fungují jako u Pampucha. Úplné ukládání používá `pmd85games.invaders.v1`;
+  rozehraná hra se obnoví pozastavená. Nepřibyla knihovna. Podklady obnoví
+  `node tools/import-invaders.mjs cesta/ke/games-1.ptp`.
 
 Podklady lze znovu importovat bez závislostí příkazem
 `node tools/import-boulder.mjs cesta/ke/games-vbg.ptp`; viz [SOURCES.md](SOURCES.md).

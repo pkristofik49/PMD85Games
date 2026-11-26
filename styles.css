@@ -73,3 +73,6 @@ body.pampuch-expanded{overflow:hidden}
 
 /* Native SABO +4 menu thumbnail. */
 .saboter-art img{image-rendering:pixelated;object-fit:contain;background:#000}
+
+/* Original IFO title and difficulty menu. */
+.invaders-art img{image-rendering:pixelated;object-fit:contain;background:#000}

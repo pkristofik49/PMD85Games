@@ -1,5 +1,46 @@
 # Sources and fidelity
 
+## Invaders / Space Invaders
+
+Original: **Ivan Fedorko / IFO Software, UAK Bratislava** in the
+[PMD other-games catalogue](https://pmd85.borik.net/wiki/Package:Games_Other.zip).
+The native title credits **1985**. Source: `INVADERS` in `games-1.ptp` from
+[the original other-games archive](https://pmd85.borik.net/?action=download&did=10).
+
+- Tape SHA-256: `bc4d5634c13d986a2fed5a224ab96c864b75e8bcd42a6bc6e6d07060c1b3a56d`.
+- Program SHA-256: `4511824b62a5c7633ccab256b742394119737880dc8f4ab60376b57c1c2d5eba`.
+
+`node tools/import-invaders.mjs path/to/games-1.ptp` imports the 1,537-byte
+record at 0100h without patching its program. After monitor initialization,
+runtime enters 0100h and stops at the original title's difficulty wait, 05FDh.
+Its framebuffer is exported as the card PNG. The five web difficulty choices
+map to native number keys 0 through 4 through the monitor's scan, debounce
+and key-release path. New game enters 02E5h, preserving native score/record
+comparison at 0416h; a cleared wave reaches that same menu naturally.
+
+Left/right map to native columns 12/14, bit 2 (the original normal-speed arrow
+inputs); fire uses column 0, bit 2. Space/Shift selects this fire matrix input,
+not the hardware SHIFT monitor-exit line. Native instructions control all
+motion, random enemy generation, single-projectile firing, sprite erasure,
+collisions, BCD score and time, three enemy breakthroughs, completion animation
+and PIO sounds. Native title/score/time/high-score pixels are preserved.
+There is no added title melody. Game over stops at 0389h after the original
+message, before its Enter wait. Completing a wave runs the native animation
+and returns to 05FDh, where the browser shows its next-wave difficulty overlay.
+
+The browser adds pause, translated help, three touch buttons, difficulty
+selection and full-machine saves. Ready/next-wave difficulty and native
+record survive reloads; active play restores paused with released keys.
+Tests verify all five native selections and their original timing operands,
+movement and single-shot behavior, a native collision/BCD increment/hit sound,
+frame partition invariance, all three real idle breakthroughs, completion
+animation and next-wave selection, native record retention and full saves.
+Collision/completion/record fixtures exercise original branches; these tests
+do not claim a full manual playthrough of every difficulty. Existing CPU
+diagnostics and independent Pampuch traces remain required. Hardware and
+archival-rights limits below apply.
+
+
 ## Saboter / Saboteur / SABO +4
 
 Original: **VBG Software, 1989** (Vlastimil Veselý, Libor Bedrlík, Ladislav
